@@ -1,0 +1,21 @@
+[package]
+name = "zerotube-backend"
+version = "0.1.0"
+authors = ["zoewithabang <zoewithabang@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+actix = "0.8.3"
+actix-cors = "0.1.0"
+actix-rt = "0.2.3"
+actix-service = "0.4.1"
+actix-session = "0.1.1"
+actix-web = "1.0.2"
+diesel = { version = "1.4.2", features = ["sqlite", "uuid", "r2d2", "chrono"] }
+dotenv = "0.14.1"
+env_logger= "0.6.1"
+futures = "0.1.27"
+log = "0.4.6"
+r2d2 = "0.8.5"
+serde = "1.0.93"
+serde_derive = "1.0.93"
