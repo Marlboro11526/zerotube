@@ -12,9 +12,28 @@ code {
     monospace;
 }
 
+.modal {
+  background: rgba(200, 200, 200, 0.5);
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.modal-body {
+  background: white;
+  height: auto;
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+}
+
 #loader {
   animation: 1s linear infinite loaderframes;
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid rgb(180, 0, 204);
   border-radius: 50%;
   left: calc(50% - 50px);
   height: 100px;

@@ -1,25 +1,18 @@
-use crate::auth::Auth;
+use crate::messages::{ErrorResponse, UserSession};
+use crate::middleware::Auth;
 use actix_cors::Cors;
-use actix_session::{CookieSession, Session};
+use actix_redis::RedisSession;
+use actix_session::Session;
 use actix_web::{
-    http::header,
-    middleware::Logger,
-    web::{self, Json},
-    App, Error, HttpResponse, HttpServer,
+    http::header, middleware::Logger, web, App, HttpRequest, HttpResponse, HttpServer,
 };
 use diesel::{r2d2::ConnectionManager, SqliteConnection};
-use futures::Future;
 use r2d2::Pool;
-use serde::{Deserialize, Serialize};
 use std::{env, io};
 
 mod auth;
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UserSession {
-    token: Option<String>,
-    user: Option<String>,
-}
+pub mod messages;
+mod middleware;
 
 fn index(session: Session) -> HttpResponse {
     let user = session.get::<UserSession>("user").unwrap_or(None);
@@ -34,30 +27,17 @@ fn invalid() -> HttpResponse {
     HttpResponse::Ok().json("NOPE")
 }
 
-fn secret() -> HttpResponse {
+fn secret(request: HttpRequest) -> HttpResponse {
+    if request.headers().get("authorization") == None {
+        let error = ErrorResponse {
+            error: "WHERE'S YR TOKEN??".to_string(),
+        };
+
+        return HttpResponse::NotFound().json(error);
+    }
     println!("POSTING SECRET MESSAGE");
 
     HttpResponse::Ok().json("SECRET MESSAGE")
-}
-
-fn login(session: Session) -> HttpResponse {
-    let user = UserSession {
-        token: None,
-        user: Some("user1".to_string()),
-    };
-    let _ = session.set("user", user);
-
-    log::info!("user {:?}", session.get::<UserSession>("user"));
-
-    HttpResponse::Found().header("location", "/").finish()
-}
-
-fn logout(session: Session) -> HttpResponse {
-    session.remove("user");
-
-    log::info!("user {:?}", session.get::<UserSession>("user"));
-
-    HttpResponse::Found().header("location", "/").finish()
 }
 
 fn main() -> io::Result<()> {
@@ -65,7 +45,7 @@ fn main() -> io::Result<()> {
 
     std::env::set_var(
         "RUST_LOG",
-        "actix_test=debug,actix_web=info,actix_server=info",
+        "error,warn,actix_redis=info,actix_server=info,actix_web=info",
     );
 
     env_logger::init();
@@ -78,7 +58,7 @@ fn main() -> io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
-            .wrap(CookieSession::signed(&[0; 32]).secure(false))
+            .wrap(RedisSession::new("localhost:6379", &[0; 32]).cookie_secure(false))
             .wrap(Logger::default())
             .wrap(
                 Cors::new()
@@ -94,8 +74,8 @@ fn main() -> io::Result<()> {
             )
             .service(
                 web::scope("/auth")
-                    .route("/login", web::get().to(login))
-                    .route("/logout", web::get().to(logout))
+                    .route("/login", web::post().to(auth::login))
+                    .route("/logout", web::post().to(auth::logout))
                     .route("/invalid", web::get().to(invalid)),
             )
             .service(

@@ -1,28 +1,30 @@
 import React, { Component, ChangeEvent, FormEvent } from 'react';
 
-interface LoginFormProperties {
+interface RegisterFormProperties {
     handleClose: any;
-    loginHandler: any;
+    registerHandler: any;
 }
 
-interface LoginFormState {
+interface RegisterFormState {
+    email?: string,
     error?: string,
     password?: string,
     username?: string,
 }
 
-class LoginForm extends Component<LoginFormProperties, LoginFormState> {
-    constructor(props: LoginFormProperties) {
+class RegisterForm extends Component<RegisterFormProperties, RegisterFormState> {
+    constructor(props: RegisterFormProperties) {
         super(props);
 
         this.state = {
+            email: undefined,
             error: undefined,
             password: undefined,
             username: undefined,
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
+        this.handleRegisterSubmit = this.handleRegisterSubmit.bind(this);
     }
 
     handleInputChange(event: ChangeEvent<HTMLInputElement>) {
@@ -32,27 +34,27 @@ class LoginForm extends Component<LoginFormProperties, LoginFormState> {
 
         this.setState({
             [name]: value,
-        } as Pick<LoginFormState, any>);
+        } as Pick<RegisterFormState, any>);
     }
 
-    async handleLoginSubmit(event: FormEvent<HTMLFormElement>) {
-        console.log("SUBMIT LOGIN");
+    async handleRegisterSubmit(event: FormEvent<HTMLFormElement>) {
+        console.log("SUBMIT REGISTER");
         event.preventDefault();
 
-        if (this.state.username && this.state.password) {
+        if (this.state.email && this.state.username && this.state.password) {
             try {
-                await this.props.loginHandler(this.state.username, this.state.password);
+                await this.props.registerHandler(this.state.email, this.state.username, this.state.password);
             } catch (error) {
                 console.log("CAUGHT");
                 this.setState({
-                    error: "Could not find username/password."
+                    error: "Unable to register this email/username."
                 });
 
                 return;
             }
         } else {
             this.setState({
-                error: "Please enter a username and password."
+                error: "Please fill out the form."
             });
         }
     }
@@ -60,17 +62,25 @@ class LoginForm extends Component<LoginFormProperties, LoginFormState> {
     render() {
         let errorMessage;
 
-        let loginForm = <form onSubmit={this.handleLoginSubmit}>
+        let registerForm = <form onSubmit={this.handleRegisterSubmit}>
+            <label>Email: </label>
+            <input
+                name='email'
+                type='text'
+                onChange={this.handleInputChange}
+            />
             <label>Username:</label>
             <input
                 name='username'
                 type='text'
-                onChange={this.handleInputChange} />
+                onChange={this.handleInputChange}
+            />
             <label>Password:</label>
             <input
                 name='password'
                 type='password'
-                onChange={this.handleInputChange} />
+                onChange={this.handleInputChange}
+            />
             <input type="submit" value="Login" />
             <button type="button" onClick={() => this.props.handleClose()}>Cancel</button>
         </form>
@@ -83,10 +93,10 @@ class LoginForm extends Component<LoginFormProperties, LoginFormState> {
         return (
             <div className="modal-body">
                 {errorMessage}
-                {loginForm}
+                {registerForm}
             </div>
         );
     }
 }
 
-export default LoginForm;
+export default RegisterForm;

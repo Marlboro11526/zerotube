@@ -7,15 +7,15 @@ edition = "2018"
 [dependencies]
 actix = "0.8.3"
 actix-cors = "0.1.0"
+actix-redis = { git = "https://github.com/actix/actix-redis" }
 actix-rt = "0.2.3"
 actix-service = "0.4.1"
 actix-session = "0.1.1"
-actix-web = "1.0.2"
-diesel = { version = "1.4.2", features = ["sqlite", "uuid", "r2d2", "chrono"] }
+actix-web = "1.0.3"
+diesel = { version = "1.4.2", features = ["chrono", "r2d2", "sqlite", "uuid"] }
 dotenv = "0.14.1"
 env_logger= "0.6.1"
-futures = "0.1.27"
+futures = "0.1.28"
 log = "0.4.6"
 r2d2 = "0.8.5"
-serde = "1.0.93"
-serde_derive = "1.0.93"
+serde = { version = "1.0.94", features = ["derive"] }

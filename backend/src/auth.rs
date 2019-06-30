@@ -1,76 +1,43 @@
-use actix_service::{Service, Transform};
-use actix_web::{
-    dev::{ServiceRequest, ServiceResponse},
-    http::header,
-    Error, HttpResponse,
-};
-use futures::{
-    future::{self, Either, FutureResult},
-    Future, Poll,
-};
+use crate::messages::{ErrorResponse, LoginRequest, RegisterRequest, UserSession};
+use actix_session::Session;
+use actix_web::{web::Json, HttpResponse};
 
-pub struct Auth;
+pub fn login(session: Session, request: Json<LoginRequest>) -> HttpResponse {
+    if request.username != "user1" && request.password != "secret" {
+        let error = ErrorResponse {
+            error: "User not found".to_string(),
+        };
 
-impl<S, B> Transform<S> for Auth
-where
-    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-    S::Future: 'static,
-    B: 'static,
-{
-    type Request = ServiceRequest;
-    type Response = ServiceResponse<B>;
-    type Error = Error;
-    type InitError = ();
-    type Transform = AuthMiddleware<S>;
-    type Future = FutureResult<Self::Transform, Self::InitError>;
+        log::info!("No user found! Returning: {:?}", error);
 
-    fn new_transform(&self, service: S) -> Self::Future {
-        future::ok(AuthMiddleware { service })
+        return HttpResponse::NotFound().json(error);
     }
+
+    let user_session = UserSession {
+        token: Some("foo".to_string()),
+        username: Some("user1".to_string()),
+    };
+
+    let _ = session.set("user", user_session.clone());
+    log::info!("user session {:?}", session.get::<UserSession>("user"));
+
+    HttpResponse::Ok().json(user_session)
 }
 
-pub struct AuthMiddleware<S> {
-    service: S,
+pub fn logout(session: Session) -> HttpResponse {
+    session.remove("user");
+
+    log::info!("user {:?}", session.get::<UserSession>("user"));
+
+    let user_session = UserSession {
+        token: None,
+        username: None,
+    };
+
+    HttpResponse::Ok().json(user_session)
 }
 
-impl<S, B> Service for AuthMiddleware<S>
-where
-    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-    S::Future: 'static,
-    B: 'static,
-{
-    type Request = ServiceRequest;
-    type Response = ServiceResponse<B>;
-    type Error = Error;
-    type Future = Either<
-        Box<Future<Item = Self::Response, Error = Self::Error>>,
-        FutureResult<Self::Response, Self::Error>,
-    >;
+pub fn register(session: Session, request: Json<RegisterRequest>) {
+    log::info!("registering: {} {}", request.0.username, request.0.email);
 
-    fn poll_ready(&mut self) -> Poll<(), Self::Error> {
-        self.service.poll_ready()
-    }
-
-    fn call(&mut self, req: ServiceRequest) -> Self::Future {
-        println!("Hello from auth layer! Request: {}", req.path());
-        println!("AUTH: {:?}", req.headers().get("authorization"));
-
-        if let Some(auth) = req.headers().get("authorization") {
-            if auth != "Anonymous" {
-                return Either::A(Box::new(self.service.call(req).and_then(|res| {
-                    println!("RESPONSE");
-                    Ok(res)
-                })));
-            }
-        }
-
-        Either::B(future::ok(
-            req.into_response(
-                HttpResponse::Found()
-                    .header(header::LOCATION, "/invalid")
-                    .finish()
-                    .into_body(),
-            ),
-        ))
-    }
 }

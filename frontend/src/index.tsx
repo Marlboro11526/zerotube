@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import LoginForm from './auth/login';
-import AuthResponse from './messages/auth';
+import LoginResponse from './messages/login';
 import * as serviceWorker from './serviceWorker';
+import AuthComponent from './auth/auth';
 
 interface AppProperties {
 
@@ -19,12 +19,12 @@ interface AppState {
 class App extends Component<AppProperties, AppState> {
     constructor(props: AppProperties) {
         super(props);
-        this.setState({
-            isLoggedIn: undefined,
+
+        this.state = {
             text: undefined,
             token: undefined,
             user: undefined,
-        });
+        };
     }
 
     componentDidMount() {
@@ -32,15 +32,16 @@ class App extends Component<AppProperties, AppState> {
             method: 'GET',
             credentials: 'include',
         })
-            .then(response => response.json() as Promise<AuthResponse>)
+            .then(response => response.json() as Promise<LoginResponse>)
             .then(response => {
-                if (response !== null && response.user !== null) {
+                if (response !== null && response.username !== null) {
                     console.log('RESPONSE: ');
                     console.log(response);
                     this.setState({
                         isLoggedIn: true,
-                        user: response.user
-                    })
+                        token: response.token,
+                        user: response.username,
+                    });
                 } else {
                     this.setState({
                         isLoggedIn: false
@@ -51,8 +52,10 @@ class App extends Component<AppProperties, AppState> {
     }
 
     showSecret(): void {
-        if (this.state.token !== undefined) {
+        console.log("STATE:");
+        console.log(this.state);
 
+        if (this.state.token !== undefined) {
             fetch('http://localhost:8081/web/secret', {
                 method: 'GET',
                 credentials: 'include',
@@ -67,22 +70,34 @@ class App extends Component<AppProperties, AppState> {
                         });
 
                         return;
+                    } else {
+                        this.setState({
+                            text: 'NOT AUTH\'D!!!'
+                        });
                     }
                 })
                 .catch((e) => console.log(e))
+        } else {
+            this.setState({
+                text: 'NOT AUTH\'D!!!'
+            });
         }
-
-        this.setState({
-            text: 'NOT AUTH\'D!!!'
-        });
     }
 
-    handleAuth(response: AuthResponse): void {
-        if (response.user !== null && response.token !== null) {
+    handleAuth(response: LoginResponse): void {
+        console.log("HANDLING AUTH");
+
+        if (response.username && response.token) {
             this.setState({
                 isLoggedIn: true,
                 token: response.token,
-                user: response.user
+                user: response.username,
+            });
+        } else {
+            this.setState({
+                isLoggedIn: false,
+                token: undefined,
+                user: undefined,
             });
         }
     }
@@ -120,10 +135,15 @@ class App extends Component<AppProperties, AppState> {
 
         return (
             <div>
-                <LoginForm
+                {/* <LoginForm
                     authHandler={(response: AuthResponse) => this.handleAuth(response)}
                     isLoggedIn={this.state.isLoggedIn}
+                /> */}
+                <AuthComponent
+                    authHandler={(response: LoginResponse) => this.handleAuth(response)}
+                    isLoggedIn={this.state.isLoggedIn}
                 />
+
                 <button onClick={() => this.showSecret()}>Secret</button>
                 {loggedInText}
                 <p>{this.state.text}</p>
