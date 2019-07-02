@@ -161,10 +161,13 @@ class AuthComponent extends Component<AuthProperties, AuthState> {
         return fetch('http://localhost:8081/auth/register', {
             method: 'POST',
             credentials: 'include',
+            headers: new Headers([['Content-Type', "application/json"]]),
             body: JSON.stringify({ email, username, password })
         })
             .then(async response => {
                 if (response.ok) {
+                    console.log(response.text());
+
                     return response.json() as Promise<RegisterResponse>;
                 } else {
                     if (response === null) {

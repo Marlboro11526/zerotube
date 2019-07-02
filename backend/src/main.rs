@@ -1,4 +1,7 @@
-use crate::messages::{ErrorResponse, UserSession};
+#[macro_use]
+extern crate diesel;
+
+use crate::messages::error::ErrorResponse;
 use crate::middleware::Auth;
 use actix_cors::Cors;
 use actix_redis::RedisSession;
@@ -11,11 +14,13 @@ use r2d2::Pool;
 use std::{env, io};
 
 mod auth;
-pub mod messages;
+mod db;
+mod messages;
 mod middleware;
+mod models;
 
 fn index(session: Session) -> HttpResponse {
-    let user = session.get::<UserSession>("user").unwrap_or(None);
+    let user = session.get::<String>("username").unwrap_or(None);
 
     println!("Current user: {:?}", user);
     HttpResponse::Ok().json(user)
@@ -29,9 +34,7 @@ fn invalid() -> HttpResponse {
 
 fn secret(request: HttpRequest) -> HttpResponse {
     if request.headers().get("authorization") == None {
-        let error = ErrorResponse {
-            error: "WHERE'S YR TOKEN??".to_string(),
-        };
+        let error = ErrorResponse::BadRequest("WHERE'S YR TOKEN??".to_string());
 
         return HttpResponse::NotFound().json(error);
     }
@@ -45,7 +48,7 @@ fn main() -> io::Result<()> {
 
     std::env::set_var(
         "RUST_LOG",
-        "error,warn,actix_redis=info,actix_server=info,actix_web=info",
+        "error,warn,info,actix_redis=info,actix_server=info,actix_web=info",
     );
 
     env_logger::init();
@@ -76,6 +79,7 @@ fn main() -> io::Result<()> {
                 web::scope("/auth")
                     .route("/login", web::post().to(auth::login))
                     .route("/logout", web::post().to(auth::logout))
+                    .route("/register", web::post().to(auth::register))
                     .route("/invalid", web::get().to(invalid)),
             )
             .service(
