@@ -1,7 +1,9 @@
+use crate::messages::error::ErrorResponse;
 use actix_service::{Service, Transform};
 use actix_session::UserSession;
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
+    error::ResponseError,
     http::header,
     Error, HttpResponse,
 };
@@ -71,13 +73,8 @@ where
             }
         }
 
-        Either::B(future::ok(
-            request.into_response(
-                HttpResponse::Found()
-                    .header(header::LOCATION, "/invalid")
-                    .finish()
-                    .into_body(),
-            ),
-        ))
+        Either::B(future::ok(request.into_response(
+            ErrorResponse::Unauthorised.error_response().into_body(),
+        )))
     }
 }

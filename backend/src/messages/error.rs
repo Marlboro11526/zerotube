@@ -1,8 +1,6 @@
 use actix_web::{error::ResponseError, HttpResponse};
 use derive_more::Display;
-use diesel::result::Error as DieselError;
-use log::Level;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[derive(Debug, Display, Serialize)]
 pub enum ErrorResponse {

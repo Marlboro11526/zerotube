@@ -3,7 +3,6 @@ import LoginResponse from "../messages/login";
 import ErrorResponse from "../messages/error";
 import LoginForm from "./login";
 import RegisterForm from "./register";
-import RegisterResponse from "../messages/register";
 import LogoutForm from "./logout";
 
 interface AuthProperties {
@@ -89,20 +88,13 @@ class AuthComponent extends Component<AuthProperties, AuthState> {
     }
 
     async handleRegister(email: string, username: string, password: string): Promise<void> {
-        let response;
-
         try {
-            response = await this.register(email, username, password);
+            await this.register(email, username, password);
         } catch (error) {
             console.log("CAUGHT " + error);
 
             throw error;
         }
-
-        console.log("SETTING RESPONSE: ");
-        console.log(response);
-
-        this.props.authHandler(response);
 
         this.setState({
             showRegisterForm: false
@@ -135,14 +127,14 @@ class AuthComponent extends Component<AuthProperties, AuthState> {
             });
     }
 
-    async logout(): Promise<LoginResponse> {
+    async logout(): Promise<void> {
         return fetch('http://localhost:8081/auth/logout', {
             method: 'POST',
             credentials: 'include',
         })
             .then(async response => {
                 if (response.ok) {
-                    return response.json() as Promise<LoginResponse>;
+                    return;
                 } else {
                     if (response === null) {
                         throw new Error("null response");
@@ -157,7 +149,9 @@ class AuthComponent extends Component<AuthProperties, AuthState> {
             });
     }
 
-    async register(email: string, username: string, password: string): Promise<RegisterResponse> {
+    async register(email: string, username: string, password: string): Promise<void> {
+        console.log("REGISTERING: " + JSON.stringify({ email, username, password }));
+
         return fetch('http://localhost:8081/auth/register', {
             method: 'POST',
             credentials: 'include',
@@ -166,9 +160,7 @@ class AuthComponent extends Component<AuthProperties, AuthState> {
         })
             .then(async response => {
                 if (response.ok) {
-                    console.log(response.text());
-
-                    return response.json() as Promise<RegisterResponse>;
+                    return;
                 } else {
                     if (response === null) {
                         throw new Error("null response");

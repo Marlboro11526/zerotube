@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id VARCHAR(63) NOT NULL PRIMARY KEY,
+    active TINYINT(1) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    username VARCHAR(31) NOT NULL UNIQUE,
     password VARCHAR(127) NOT NULL,
-    active TINYINT(1) NOT NULL
+    username VARCHAR(31) NOT NULL UNIQUE
 );

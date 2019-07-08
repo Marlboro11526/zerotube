@@ -12,6 +12,7 @@ actix-rt = "0.2.3"
 actix-service = "0.4.1"
 actix-session = "0.1.1"
 actix-web = "1.0.3"
+actix-web-actors = "1.0.1"
 argon2rs = "0.2.5"
 chrono = { version = "0.4.7", features = ["serde"] }
 derive_more = "0.15.0"

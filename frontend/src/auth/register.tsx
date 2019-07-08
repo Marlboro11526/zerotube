@@ -31,6 +31,7 @@ class RegisterForm extends Component<RegisterFormProperties, RegisterFormState> 
         const target = event.target!;
         const name = target.name;
         const value = target.type === 'checkbox' ? target.checked : target.value;
+        console.log(name + " changed to " + value);
 
         this.setState({
             [name]: value,
@@ -43,9 +44,10 @@ class RegisterForm extends Component<RegisterFormProperties, RegisterFormState> 
 
         if (this.state.email && this.state.username && this.state.password) {
             try {
+                console.log("SENDING " + this.state.email + " " + this.state.username + " " + this.state.password);
                 await this.props.registerHandler(this.state.email, this.state.username, this.state.password);
             } catch (error) {
-                console.log("CAUGHT");
+                console.log("CAUGHT: " + error);
                 this.setState({
                     error: "Unable to register this email/username."
                 });
@@ -81,7 +83,7 @@ class RegisterForm extends Component<RegisterFormProperties, RegisterFormState> 
                 type='password'
                 onChange={this.handleInputChange}
             />
-            <input type="submit" value="Login" />
+            <input type="submit" value="Register" />
             <button type="button" onClick={() => this.props.handleClose()}>Cancel</button>
         </form>
 

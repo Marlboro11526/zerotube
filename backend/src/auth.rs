@@ -1,46 +1,59 @@
 use crate::db::users;
 use crate::messages::{
-    auth::{LoginRequest, RegisterRequest},
+    auth::{LoginRequest, LoginResponse, RegisterRequest},
     error::ErrorResponse,
 };
 use crate::models::user::User;
+use crate::util;
 use actix_session::Session;
 use actix_web::{
-    web::{self, Json},
-    Error, HttpResponse, ResponseError,
+    web::{Data, Json, Path},
+    HttpResponse, ResponseError,
 };
 use diesel::{r2d2::ConnectionManager, SqliteConnection};
 
 type Pool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
 
-pub fn login(session: Session, request: Json<LoginRequest>) -> HttpResponse {
-    if request.username != "user1" && request.password != "secret" {
-        let error = ErrorResponse::BadRequest("User not found".to_string());
+pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) -> HttpResponse {
+    let connection = pool.get().unwrap();
 
-        log::info!("No user found! Returning: {:?}", error);
+    let user = users::get_user_with_username(&request.username, &connection);
 
-        return HttpResponse::NotFound().json(error);
+    if user.is_err() {
+        return HttpResponse::NotFound().finish();
     }
 
-    let _ = session.set("username", "user1");
+    let is_match = util::compare_password(&request.password, &user.unwrap().password);
+
+    match is_match {
+        Err(_) => return HttpResponse::NotFound().finish(),
+        Ok(false) => return HttpResponse::NotFound().finish(),
+        Ok(true) => (),
+    }
+
+    let result = session.set("username", &request.username);
+
+    if result.is_err() {
+        return ErrorResponse::InternalServerError.error_response();
+    };
+
     log::info!("user session {:?}", session.get::<String>("username"));
 
-    HttpResponse::Ok().json("user1")
+
+    HttpResponse::Ok().json(LoginResponse {
+        username: request.username.clone(),
+    })
 }
 
 pub fn logout(session: Session) -> HttpResponse {
-    session.remove("user");
+    session.remove("username");
 
-    log::info!("user {:?}", session.get::<String>("username"));
+    log::info!("username {:?}", session.get::<String>("username"));
 
     HttpResponse::Ok().finish()
 }
 
-pub fn register(
-    session: Session,
-    pool: web::Data<Pool>,
-    request: Json<RegisterRequest>,
-) -> HttpResponse {
+pub fn register(pool: Data<Pool>, request: Json<RegisterRequest>) -> HttpResponse {
     println!("TEST");
     log::info!("registering: {} {}", request.0.username, request.0.email);
 
@@ -48,20 +61,45 @@ pub fn register(
     let user = users::get_user_with_email(&request.email, &connection);
 
     if user.is_err() {
+        log::error!("Error on getting user with email {}", request.email);
+
         return user.unwrap_err().error_response();
     }
 
-    if let Some(user) = user.unwrap() {
+    if let Some(_) = user.unwrap() {
+        log::warn!(
+            "User attempted to register with existing email {}",
+            request.email
+        );
+
         return ErrorResponse::BadRequest("User already exists".into()).error_response();
     }
 
-    let user = User {
-        email: request.email.clone(),
-        username: request.username.clone(),
-        password: request.password.clone(),
-    };
-
+    let user = request.into_inner().into();
     let result = users::create_user_and_confirmation_email(user, &connection);
+
+    if result.is_err() {
+        log::error!("Error on creating user and confirmation email");
+
+        return result.unwrap_err().error_response();
+    }
+
+    HttpResponse::Ok().finish()
+}
+
+pub fn register_confirm(confirmation_id: Path<String>, pool: Data<Pool>) -> HttpResponse {
+    let connection = pool.get().unwrap();
+
+    let result = users::confirm_registration(confirmation_id.clone(), &connection);
+
+    if result.is_err() {
+        log::error!(
+            "Error on confirming registration for ID {}",
+            confirmation_id.into_inner()
+        );
+
+        return result.unwrap_err().error_response();
+    }
 
     HttpResponse::Ok().finish()
 }

@@ -19,7 +19,7 @@ class LogoutForm extends Component<LogoutFormProperties> {
         try {
             await this.props.logoutHandler();
         } catch (error) {
-            console.log("CAUGHT");
+            console.log("CAUGHT" + error);
 
             return;
         }
