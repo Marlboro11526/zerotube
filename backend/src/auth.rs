@@ -1,9 +1,8 @@
 use crate::db::users;
 use crate::messages::{
-    auth::{LoginRequest, LoginResponse, RegisterRequest},
+    auth::{LoginRequest, RegisterRequest, UserResponse},
     error::ErrorResponse,
 };
-use crate::models::user::User;
 use crate::util;
 use actix_session::Session;
 use actix_web::{
@@ -13,6 +12,16 @@ use actix_web::{
 use diesel::{r2d2::ConnectionManager, SqliteConnection};
 
 type Pool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
+
+pub fn start(session: Session) -> HttpResponse {
+    let username = session.get::<String>("username").unwrap_or(None);
+
+    log::info!("Current user: {:?}", username);
+
+    HttpResponse::Ok().json(UserResponse {
+        username
+    })
+}
 
 pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) -> HttpResponse {
     let connection = pool.get().unwrap();
@@ -39,9 +48,8 @@ pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) ->
 
     log::info!("user session {:?}", session.get::<String>("username"));
 
-
-    HttpResponse::Ok().json(LoginResponse {
-        username: request.username.clone(),
+    HttpResponse::Ok().json(UserResponse {
+        username: Some(request.username.clone()),
     })
 }
 

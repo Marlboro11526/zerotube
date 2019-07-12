@@ -1,0 +1,22 @@
+/* Import all bulma modules. */
+@import "bulmaswatch-cyborg";
+
+#loader {
+  animation: 1s linear infinite loaderframes;
+  border-bottom: 2px solid rgb(180, 0, 204);
+  border-radius: 50%;
+  left: calc(50% - 50px);
+  height: 100px;
+  position: absolute;
+  top: calc(50% - 50px);
+  width: 100px;
+}
+
+@keyframes loaderframes {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

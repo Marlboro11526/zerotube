@@ -11,8 +11,8 @@ pub struct LoginRequest {
 }
 
 #[derive(Serialize)]
-pub struct LoginResponse {
-    pub username: String,
+pub struct UserResponse {
+    pub username: Option<String>,
 }
 
 pub struct RegisterRequest {

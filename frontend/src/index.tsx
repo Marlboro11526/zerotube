@@ -1,94 +1,50 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import * as serviceWorker from './serviceWorker';
-import LoginResponse from './messages/login';
-import AuthComponent from './auth/auth';
-import TimeComponent from './time/time';
-import validator from 'validator';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import "react-toastify/dist/ReactToastify.css";
+import "./static/styles/style.scss";
+import * as serviceWorker from "./serviceWorker";
+import UserResponse from "./messages/user";
+import Time from "./time/time";
+import ConfirmRegister from "./confirm-register/confirm-register";
+import { toast } from "react-toastify";
+import Navbar from "./navbar/navbar";
+import Rooms from "./rooms/rooms";
+import { Section, Container, Button } from "trunx";
 
-interface AppProperties {
-
-}
+interface AppProperties { }
 
 interface AppState {
     error?: string,
     isLoggedIn?: boolean,
-    registrationConfirmation?: string,
     serverTime?: Date,
     text?: string,
-    user?: string,
+    username?: string,
 }
 
 class App extends Component<AppProperties, AppState> {
     constructor(props: AppProperties) {
         super(props);
 
-        let registrationConfirmation = undefined;
-
-        console.log(window.location.pathname);
-
-        if (window.location.pathname.startsWith("/confirm/")) {
-            let id = window.location.pathname.slice("/confirm/".length);
-            if (validator.isUUID(id)) {
-                registrationConfirmation = id;
-            }
-        }
-
         this.state = {
             error: undefined,
-            registrationConfirmation: registrationConfirmation,
             isLoggedIn: undefined,
             serverTime: undefined,
             text: undefined,
-            user: undefined,
+            username: undefined,
         };
-
-        console.log(registrationConfirmation);
-        console.log(this.state);
     }
 
-    componentDidMount() {
-        if (this.state.registrationConfirmation) {
-            fetch('http://localhost:8081/auth/register/' + this.state.registrationConfirmation, {
-                method: 'GET',
-                credentials: 'include',
-            })
-                .then(async response => {
-                    if (response.ok) {
-                        return;
-                    } else {
-                        if (response === null) {
-                            this.setState({
-                                error: "Null response"
-                            });
-                        } else if (response.body === null) {
-                            this.setState({
-                                error: "Null body"
-                            });
-                        } else {
-                            let error = await response.json();
-
-                            this.setState({
-                                error: error
-                            });
-                        }
-                    }
-                });
-        }
-
-        fetch('http://localhost:8081/', {
-            method: 'GET',
-            credentials: 'include',
+    componentDidMount(): void {
+        fetch("http://localhost:8081/auth/start", {
+            method: "GET",
+            credentials: "include",
         })
-            .then(response => response.json() as Promise<LoginResponse>)
+            .then(response => response.json() as Promise<UserResponse>)
             .then(response => {
                 if (response !== null && response.username !== null) {
-                    console.log('RESPONSE: ');
-                    console.log(response);
                     this.setState({
                         isLoggedIn: true,
-                        user: response.username,
+                        username: response.username,
                     });
                 } else {
                     this.setState({
@@ -96,16 +52,13 @@ class App extends Component<AppProperties, AppState> {
                     });
                 }
             })
-            .catch((e) => console.log(e));
+            .catch(e => toast("Unable to connect to server.", { type: "error" }));
     }
 
     showSecret(): void {
-        console.log("STATE:");
-        console.log(this.state);
-
-        fetch('http://localhost:8081/web/secret', {
-            method: 'GET',
-            credentials: 'include',
+        fetch("http://localhost:8081/web/secret", {
+            method: "GET",
+            credentials: "include",
         })
             .then(response => {
                 if (response.ok) {
@@ -118,94 +71,79 @@ class App extends Component<AppProperties, AppState> {
                     return;
                 } else {
                     this.setState({
-                        text: 'NOT AUTH\'D!!!'
+                        text: "NOT AUTH'D!!!"
                     });
                 }
             })
             .catch((e) => console.log(e))
     }
 
-    handleAuth(response: LoginResponse): void {
-        console.log("HANDLING AUTH");
-
+    handleAuth(response: UserResponse): void {
+        console.log("AUTHING");
+        console.log(response);
         if (response && response.username) {
             this.setState({
                 isLoggedIn: true,
-                user: response.username,
+                username: response.username,
             });
         } else {
             this.setState({
                 isLoggedIn: false,
-                user: undefined,
+                username: undefined,
             });
         }
     }
 
     render(): JSX.Element {
-        if (window.location.pathname.startsWith("/confirm/")) {
-            let id = window.location.pathname.slice("/confirm/".length);
-            if (validator.isUUID(id)) {
-                return <>
-                    <h1>{id}</h1>
-                    <h2>{this.state.error}</h2>
-                    <p><a href="/">Return to home</a></p>
-                </>
-            }
+        let pageContent;
+        let time;
+
+        // special case for confirming registration, standalone "page"
+        if (window.location.pathname.startsWith("/confirm")) {
+            return <ConfirmRegister />
         }
 
         if (this.state === null || this.state.isLoggedIn === undefined) {
-            return <span id='loader' />
+            return <span id="loader" />
         }
 
-        let loggedInText;
-
         if (this.state.isLoggedIn) {
-            loggedInText = <p>User: {this.state.user}</p>;
+            time = <Time />
+        }
+
+        if (window.location.pathname.startsWith("/rooms")) {
+            pageContent = <Rooms />
         } else {
-            loggedInText = <p>Not logged in...</p>
+            pageContent =
+                <>
+                    <Button isPrimary onClick={() => this.showSecret()}>Secret</Button>
+                    <p>{this.state.text}</p>
+                    {time}
+                </>
         }
 
-        const isDebug = true;
-        let debugZone;
-
-        if (isDebug) {
-            debugZone = <>
-                <br />
-                <br />
-                <p>~DEBUG ZONE~</p>
-                <p>Is Logged In: {this.state.isLoggedIn ? 'Yes' : 'No'}</p>
-                <p>Text: '{this.state.text}'</p>
-                <p>User: {this.state.user}</p>
-            </>
-        }
-
-        let time;
-
-        if (this.state.isLoggedIn) {
-            time = <TimeComponent />
-        }
-
-        console.log('END OF RENDER:');
+        console.log("CURRENT STATE:");
         console.log(this.state);
 
         return (
-            <div>
-                <AuthComponent
-                    authHandler={(response: LoginResponse) => this.handleAuth(response)}
+            <>
+                <Navbar
+                    authHandler={(response: UserResponse) => this.handleAuth(response)}
                     isLoggedIn={this.state.isLoggedIn}
+                    username={this.state.username}
                 />
-
-                <button onClick={() => this.showSecret()}>Secret</button>
-                {loggedInText}
-                <p>{this.state.text}</p>
-                {debugZone}
-                {time}
-            </div>
+                <Section>
+                    <Container>
+                        {pageContent}
+                    </Container>
+                </Section>
+            </>
         )
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+toast.configure();
+ReactDOM.render(<App />, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

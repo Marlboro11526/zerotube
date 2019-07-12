@@ -67,7 +67,8 @@ where
         if let Some(username) = username {
             if username != "Anonymous" {
                 return Either::A(Box::new(self.service.call(request).and_then(|response| {
-                    println!("RESPONSE");
+                    log::info!("RESPONSE");
+
                     Ok(response)
                 })));
             }

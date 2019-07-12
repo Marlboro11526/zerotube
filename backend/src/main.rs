@@ -4,7 +4,6 @@ extern crate diesel;
 use crate::middleware::Auth;
 use actix_cors::Cors;
 use actix_redis::RedisSession;
-use actix_session::Session;
 use actix_web::{http::header, middleware::Logger, web, App, HttpResponse, HttpServer};
 use diesel::{r2d2::ConnectionManager, SqliteConnection};
 use r2d2::Pool;
@@ -18,13 +17,6 @@ mod models;
 mod rooms;
 mod util;
 mod ws;
-
-fn index(session: Session) -> HttpResponse {
-    let user = session.get::<String>("username").unwrap_or(None);
-
-    println!("Current user: {:?}", user);
-    HttpResponse::Ok().json(user)
-}
 
 fn secret() -> HttpResponse {
     println!("POSTING SECRET MESSAGE");
@@ -66,6 +58,7 @@ fn main() -> io::Result<()> {
             )
             .service(
                 web::scope("/auth")
+                    .route("/start", web::get().to(auth::start))
                     .route("/login", web::post().to(auth::login))
                     .route("/logout", web::post().to(auth::logout))
                     .route("/register", web::post().to(auth::register))
@@ -90,7 +83,6 @@ fn main() -> io::Result<()> {
                     .route("/time", web::get().to(ws::time::route))
                     .wrap(Auth),
             )
-            .route("/", web::get().to(index))
     })
     .bind("localhost:8081")?
     .run()

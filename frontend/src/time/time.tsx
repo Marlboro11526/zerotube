@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-const URL = 'ws://localhost:8081/ws/time';
+const URL = "ws://localhost:8081/ws/time";
+
+let isClosing = false;
+let ws: WebSocket;
 
 interface TimeProperties {
 
@@ -8,53 +11,43 @@ interface TimeProperties {
 
 interface TimeState {
     time?: Date,
-    ws?: WebSocket,
 }
 
-class TimeComponent extends Component<TimeProperties, TimeState> {
+export default class Time extends Component<TimeProperties, TimeState> {
     constructor(props: TimeProperties) {
         super(props);
 
         this.state = {
             time: undefined,
-            ws: undefined,
         };
     }
 
-    componentDidMount() {
-        let ws = new WebSocket(URL, 'time');
-
-        ws.onopen = () => {
-            console.log('WS CONNECTED')
-
-            /*setInterval(() => {
-                ws.send("test")
-            }, 1000);*/
-        };
+    componentDidMount(): void {
+        ws = new WebSocket(URL);
 
         ws.onmessage = event => {
-            console.log("RECEIVED " + event.data);
-
             this.setState({
                 time: event.data
             });
         };
 
         ws.onclose = () => {
-            console.log('WS DISCONNECTED');
-
-            this.setState({
-                ws: new WebSocket(URL, 'time'),
-            });
+            if (!isClosing) {
+                setTimeout(
+                    () => ws = new WebSocket(URL),
+                    5000
+                );
+            }
         };
-
-        this.setState({
-            ws: ws
-        });
     }
 
-    testResponse() {
-        this.state.ws!.send("foo");
+    componentWillUnmount(): void {
+        isClosing = true;
+        ws.close();
+    }
+
+    testResponse(): void {
+        ws.send("foo");
     }
 
     render(): JSX.Element {
@@ -64,5 +57,3 @@ class TimeComponent extends Component<TimeProperties, TimeState> {
         </>
     }
 }
-
-export default TimeComponent;
