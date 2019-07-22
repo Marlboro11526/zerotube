@@ -6,23 +6,53 @@ use r2d2::PooledConnection;
 
 type Connection = PooledConnection<ConnectionManager<SqliteConnection>>;
 
-pub fn get_room_with_name(
+pub fn get_room_with_url(
+    url_input: String,
+    connection: &Connection,
+) -> Result<Room, ErrorResponse> {
+    use crate::db::schema::rooms::dsl::*;
+
+    rooms
+        .filter(url.eq(&url_input))
+        .load::<DbRoom>(connection)
+        .map_err(|err| {
+            log::error!(
+                "Failed to load room from DB.\nError: {}\nURL: {}",
+                err,
+                url_input,
+            );
+
+            ErrorResponse::BadRequest("Invalid URL".into())
+        })
+        .and_then(|mut result| {
+            if let Some(room) = result.pop() {
+                Ok(room.into())
+            } else {
+                Err(ErrorResponse::BadRequest("Room not found".into()))
+            }
+        })
+}
+
+pub fn get_room_with_name_and_url(
     name_input: &str,
+    url_input: &str,
     connection: &Connection,
 ) -> Result<Room, ErrorResponse> {
     use crate::db::schema::rooms::dsl::*;
 
     rooms
         .filter(name.eq(name_input))
+        .or_filter(url.eq(url_input))
         .load::<DbRoom>(connection)
         .map_err(|err| {
             log::error!(
-                "Failed to load room from DB.\nError: {}\nName: {}",
+                "Failed to load room from DB.\nError: {}\nName: {}\nURL: {}",
                 err,
                 name_input,
+                url_input,
             );
 
-            ErrorResponse::BadRequest("Invalid name".into())
+            ErrorResponse::BadRequest("Invalid URL".into())
         })
         .and_then(|mut result| {
             if let Some(room) = result.pop() {
@@ -57,10 +87,11 @@ pub fn get_all_public(connection: &Connection) -> Result<Vec<Room>, ErrorRespons
     use crate::db::schema::rooms::dsl::*;
 
     rooms
+        .filter(public.eq(true))
         .load::<DbRoom>(connection)
         .map(|out| {
             out.into_iter()
-                .map(|val| Room::from(val))
+                .map(Room::from)
                 .collect::<Vec<Room>>()
         })
         .map_err(|err| {

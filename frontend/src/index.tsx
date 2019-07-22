@@ -8,32 +8,25 @@ import Time from "./time/time";
 import ConfirmRegister from "./confirm-register/confirm-register";
 import { toast } from "react-toastify";
 import Navbar from "./navbar/navbar";
-import Rooms from "./rooms/rooms";
+import RoomsList from "./rooms-list/rooms-list";
 import { Section, Container, Button } from "trunx";
+import Error404 from "./error/error404";
+import { RoomResponse } from "./messages/room";
+import Room from "./room/room";
+import Error401 from "./error/error401";
 
 interface AppProperties { }
 
 interface AppState {
     error?: string,
     isLoggedIn?: boolean,
+    room?: RoomResponse,
     serverTime?: Date,
     text?: string,
     username?: string,
 }
 
 class App extends Component<AppProperties, AppState> {
-    constructor(props: AppProperties) {
-        super(props);
-
-        this.state = {
-            error: undefined,
-            isLoggedIn: undefined,
-            serverTime: undefined,
-            text: undefined,
-            username: undefined,
-        };
-    }
-
     componentDidMount(): void {
         fetch("http://localhost:8081/auth/start", {
             method: "GET",
@@ -52,7 +45,21 @@ class App extends Component<AppProperties, AppState> {
                     });
                 }
             })
-            .catch(e => toast("Unable to connect to server.", { type: "error" }));
+            .catch(() => toast("Unable to connect to server.", { type: "error" }));
+
+
+        let url = document.location.pathname.substring(1);
+
+        if (Room.isPotentialRoomUrl(url)) {
+            Room.getRoom(url)
+                .then(response => {
+                    if (response !== null) {
+                        this.setState({
+                            room: response
+                        });
+                    }
+                });
+        }
     }
 
     showSecret(): void {
@@ -75,7 +82,7 @@ class App extends Component<AppProperties, AppState> {
                     });
                 }
             })
-            .catch((e) => console.log(e))
+            .catch(e => console.log(e))
     }
 
     handleAuth(response: UserResponse): void {
@@ -112,14 +119,31 @@ class App extends Component<AppProperties, AppState> {
         }
 
         if (window.location.pathname.startsWith("/rooms")) {
-            pageContent = <Rooms />
-        } else {
+            if (this.state.isLoggedIn) {
+                pageContent = <RoomsList />
+            } else {
+                return <Error401 />
+            }
+        } else if (window.location.pathname === "/") {
             pageContent =
                 <>
                     <Button isPrimary onClick={() => this.showSecret()}>Secret</Button>
                     <p>{this.state.text}</p>
                     {time}
                 </>
+        } else {
+            console.log("1");
+            console.log(this.state.room);
+            if (this.state.room) {
+                console.log("2" + this.state.room.name);
+                pageContent =
+                    <>
+                        <p>{this.state.room.name} - {this.state.room.description}</p>
+                    </>
+            }
+            else {
+                return <Error404 />
+            }
         }
 
         console.log("CURRENT STATE:");

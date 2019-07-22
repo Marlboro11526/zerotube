@@ -68,9 +68,10 @@ fn main() -> io::Result<()> {
                     ),
             )
             .service(
-                web::scope("/room")
+                web::scope("/rooms")
                     .route("/create", web::post().to(rooms::create))
                     .route("/get", web::get().to(rooms::get_all))
+                    .route("/get/{room_url}", web::get().to(rooms::get))
                     .wrap(Auth),
             )
             .service(

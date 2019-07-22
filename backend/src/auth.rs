@@ -46,6 +46,8 @@ pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) ->
         return ErrorResponse::InternalServerError.error_response();
     };
 
+    session.renew();
+
     log::info!("user session {:?}", session.get::<String>("username"));
 
     HttpResponse::Ok().json(UserResponse {
@@ -54,7 +56,7 @@ pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) ->
 }
 
 pub fn logout(session: Session) -> HttpResponse {
-    session.remove("username");
+    session.purge();
 
     log::info!("username {:?}", session.get::<String>("username"));
 
@@ -74,7 +76,7 @@ pub fn register(pool: Data<Pool>, request: Json<RegisterRequest>) -> HttpRespons
         return user.unwrap_err().error_response();
     }
 
-    if let Some(_) = user.unwrap() {
+    if user.unwrap().is_some() {
         log::warn!(
             "User attempted to register with existing email {}",
             request.email

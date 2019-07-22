@@ -9,8 +9,10 @@ table! {
 table! {
     rooms (id) {
         id -> Text,
+        description -> Text,
         name -> Text,
         public -> Bool,
+        url -> Text,
     }
 }
 

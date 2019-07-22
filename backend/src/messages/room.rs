@@ -3,8 +3,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub struct RoomCreateRequest {
+    pub description: String,
     pub name: String,
     pub public: bool,
+    pub url: String,
 }
 
 #[derive(Serialize)]

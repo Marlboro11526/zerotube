@@ -130,13 +130,13 @@ fn get_confirmation_email_by_id(
                 confirmation_id
             );
 
-            return ErrorResponse::BadRequest("Invalid ID".into());
+            ErrorResponse::BadRequest("Invalid ID".into())
         })
         .and_then(|mut result| {
             if let Some(email) = result.pop() {
                 Ok(email)
             } else {
-                return Err(ErrorResponse::BadRequest("Invalid ID".into()));
+                Err(ErrorResponse::BadRequest("Invalid ID".into()))
             }
         })
 }
@@ -153,7 +153,7 @@ fn update_user_activity_by_id(
     diesel::update(user)
         .set(active.eq(new_active))
         .execute(connection)
-        .map(|val| Ok(val))
+        .map(Ok)
         .map_err(|err| {
             log::error!("Failed to update user.\nError: {}\nID: {}", err, user_id);
 

@@ -1,5 +1,7 @@
 import React, { Component, ChangeEvent } from "react";
-import { Label, Input } from "trunx";
+import { Label, Input, Field } from "trunx";
+import Icon from "@mdi/react";
+import { mdiHelpCircle } from "@mdi/js";
 
 interface RegisterFormProperties {
     inputHandler: any,
@@ -35,32 +37,46 @@ export default class RegisterForm extends Component<RegisterFormProperties, Regi
 
         this.setState({
             [name]: value,
-        } as Pick<RegisterFormState, any>,
+        } as RegisterFormState,
             () => this.props.inputHandler(this.state.email, this.state.password, this.state.username));
     }
 
     render(): JSX.Element {
         return (
             <>
-                <Label>Email:</Label>
-                <Input
-                    name="email"
-                    type="text"
-                    onChange={this.handleInputChange}
-                    autoFocus
-                />
-                <Label>Username:</Label>
-                <Input
-                    name="username"
-                    type="text"
-                    onChange={this.handleInputChange}
-                />
-                <Label>Password:</Label>
-                <Input
-                    name="password"
-                    type="password"
-                    onChange={this.handleInputChange}
-                />
+                <Field>
+                    <Label>
+                        Email
+                        <Icon
+                            color="#FFF"
+                            path={mdiHelpCircle}
+                            size={"1rem"}
+                            title="Needs to be valid so that you can click the confirmation link!"
+                        />
+                    </Label>
+                    <Input
+                        name="email"
+                        type="text"
+                        onChange={this.handleInputChange}
+                        autoFocus
+                    />
+                </Field>
+                <Field>
+                    <Label>Username</Label>
+                    <Input
+                        name="username"
+                        type="text"
+                        onChange={this.handleInputChange}
+                    />
+                </Field>
+                <Field>
+                    <Label>Password</Label>
+                    <Input
+                        name="password"
+                        type="password"
+                        onChange={this.handleInputChange}
+                    />
+                </Field>
             </>
         );
     }

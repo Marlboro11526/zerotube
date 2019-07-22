@@ -161,7 +161,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                 showRegisterForm: false
             });
         } catch (error) {
-            throw error;
+            toast("Registration failed.", { type: "error" });
         }
     }
 
@@ -283,6 +283,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
             username =
                 <div className="navbar-item">
                     <Icon
+                        className="icon-left-offset"
                         color="#FFF"
                         path={mdiAccount}
                         size={"1.5rem"}
@@ -297,10 +298,10 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                     <Buttons>
                         <Button isPrimary onClick={() => this.showLoginForm(true)}>
                             Login
-                    </Button>
+                        </Button>
                         <Button isPrimary onClick={() => this.showRegisterForm(true)}>
                             Register
-                    </Button>
+                        </Button>
                     </Buttons>
                 </div>
         }

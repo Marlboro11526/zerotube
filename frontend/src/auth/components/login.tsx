@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent } from "react";
-import { Input, Label } from "trunx";
+import { Input, Label, Field } from "trunx";
 
 interface LoginFormProperties {
     inputHandler: any,
@@ -27,30 +27,34 @@ export default class LoginForm extends Component<LoginFormProperties, LoginFormS
     }
 
     handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        const target = event.target!;
-        const name = target.name;
-        const value = target.type === "checkbox" ? target.checked : target.value;
+        const TARGET = event.target!;
+        const NAME = TARGET.name;
+        const VALUE = TARGET.type === "checkbox" ? TARGET.checked : TARGET.value;
 
         this.setState({
-            [name]: value,
-        } as Pick<LoginFormState, any>,
+            [NAME]: VALUE,
+        } as LoginFormState,
             () => this.props.inputHandler(this.state.password, this.state.username));
     }
 
     render(): JSX.Element {
         return (
             <>
-                <Label>Username:</Label>
-                <Input
-                    name="username"
-                    type="text"
-                    onChange={this.handleInputChange}
-                    autoFocus />
-                <Label>Password:</Label>
-                <Input
-                    name="password"
-                    type="password"
-                    onChange={this.handleInputChange} />
+                <Field>
+                    <Label>Username</Label>
+                    <Input
+                        name="username"
+                        type="text"
+                        onChange={this.handleInputChange}
+                        autoFocus />
+                </Field>
+                <Field>
+                    <Label>Password</Label>
+                    <Input
+                        name="password"
+                        type="password"
+                        onChange={this.handleInputChange} />
+                </Field>
             </>
         );
     }

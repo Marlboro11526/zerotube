@@ -149,7 +149,7 @@ impl<'de> Deserialize<'de> for RegisterRequest {
             }
         }
 
-        const FIELDS: &'static [&'static str] = &["email", "password", "username"];
+        const FIELDS: &[&str; 3] = &["email", "password", "username"];
 
         deserializer.deserialize_struct("Duration", FIELDS, RegisterRequestVisitor)
     }

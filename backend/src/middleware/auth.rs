@@ -4,8 +4,7 @@ use actix_session::UserSession;
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     error::ResponseError,
-    http::header,
-    Error, HttpResponse,
+    Error,
 };
 use futures::{
     future::{self, Either, FutureResult},
@@ -23,8 +22,8 @@ where
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
     type Error = Error;
-    type InitError = ();
     type Transform = AuthMiddleware<S>;
+    type InitError = ();
     type Future = FutureResult<Self::Transform, Self::InitError>;
 
     fn new_transform(&self, service: S) -> Self::Future {
