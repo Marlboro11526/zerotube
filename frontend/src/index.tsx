@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./static/styles/style.scss";
-import * as serviceWorker from "./serviceWorker";
 import UserResponse from "./messages/user";
 import Time from "./time/time";
 import ConfirmRegister from "./confirm-register/confirm-register";
@@ -98,7 +97,6 @@ class App extends Component<AppProperties, AppState> {
 
     render(): JSX.Element {
         let pageContent;
-        let time;
 
         // special case for confirming registration, standalone "page"
         if (window.location.pathname.startsWith("/confirm")) {
@@ -116,6 +114,8 @@ class App extends Component<AppProperties, AppState> {
                 return <Error401 />
             }
         } else if (window.location.pathname === "/") {
+            let time;
+
             if (this.state.isLoggedIn) {
                 time = <Time />
             }
@@ -128,10 +128,7 @@ class App extends Component<AppProperties, AppState> {
                 </>
         } else {
             if (this.state.room) {
-                pageContent =
-                    <>
-                        <Room room={this.state.room} />
-                    </>
+                pageContent = <Room room={this.state.room} />
             }
             else {
                 return <Error404 />
@@ -160,8 +157,3 @@ class App extends Component<AppProperties, AppState> {
 
 toast.configure();
 ReactDOM.render(<App />, document.getElementById("root"));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
