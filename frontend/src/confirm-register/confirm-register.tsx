@@ -20,18 +20,17 @@ export default class ConfirmRegister extends Component<ConfirmRegisterProperties
         };
     }
 
-    componentDidMount(): void {
+    async componentDidMount(): Promise<void> {
         if (this.state.id === undefined) {
             return;
         }
 
-        fetch("https://localhost:8443/auth/register/" + this.state.id, {
+        let response = await fetch("https://localhost:8443/auth/register/" + this.state.id, {
             method: "GET",
             credentials: "include",
         })
-            .then(response => {
-                this.setState({ isValid: response.ok });
-            });
+
+        this.setState({ isValid: response.ok });
     }
 
     render(): JSX.Element {

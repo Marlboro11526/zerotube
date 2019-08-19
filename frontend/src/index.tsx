@@ -27,26 +27,30 @@ interface AppState {
 }
 
 class App extends Component<AppProperties, AppState> {
-    componentDidMount(): void {
-        fetch("https://localhost:8443/auth/start", {
-            method: "GET",
-            credentials: "include",
-        })
-            .then(response => response.json() as Promise<UserResponse>)
-            .then(response => {
-                if (response !== null && response.username !== null) {
-                    this.setState({
-                        isLoggedIn: true,
-                        username: response.username,
-                    });
-                } else {
-                    this.setState({
-                        isLoggedIn: false
-                    });
-                }
-            })
-            .catch(() => toast("Unable to connect to server.", { type: "error" }));
+    async componentDidMount(): Promise<void> {
+        let response;
 
+        try {
+            response = await fetch("https://localhost:8443/auth/start", {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                throw new Error("Server did not respond with 200 OK.");
+            }
+        }
+        catch (err) {
+            console.log(err);
+            toast("Unable to connect to server.", { type: "error" });
+
+            return;
+        }
+
+        if (response.ok) {
+            let user = await response.json() as UserResponse;
+            this.handleAuth(user);
+        }
 
         let url = document.location.pathname.substring(1);
 
@@ -62,32 +66,23 @@ class App extends Component<AppProperties, AppState> {
         }
     }
 
-    showSecret(): void {
-        fetch("https://localhost:8443/web/secret", {
+    async showSecret(): Promise<void> {
+        let response = await fetch("https://localhost:8443/web/secret", {
             method: "GET",
             credentials: "include",
-        })
-            .then(response => {
-                if (response.ok) {
-                    response.json().then(json => {
-                        this.setState({
-                            text: json
-                        })
-                    });
+        });
 
-                    return;
-                } else {
-                    this.setState({
-                        text: "NOT AUTH'D!!!"
-                    });
-                }
-            })
-            .catch(e => console.log(e))
+        if (response.ok) {
+            let text = await response.json()
+
+            this.setState({ text: text });
+        } else {
+            this.setState({ text: "NOT AUTH'D!!!" });
+        }
+
     }
 
     handleAuth(response: UserResponse): void {
-        console.log("AUTHING");
-        console.log(response);
         if (response && response.username) {
             this.setState({
                 isLoggedIn: true,

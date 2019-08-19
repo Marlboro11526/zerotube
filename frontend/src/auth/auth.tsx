@@ -166,60 +166,57 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     }
 
     async login(username: string, password: string): Promise<UserResponse> {
-        return fetch("https://localhost:8443/auth/login", {
+        let response = await fetch("https://localhost:8443/auth/login", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
             body: JSON.stringify({ username, password })
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on login: " + error);
+        });
 
-                    throw new Error("Error on login: " + error);
-                }
-            });
+        if (response.ok) {
+            return response.json();
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on login: " + error);
+
+            throw new Error("Error on login: " + error);
+        }
     }
 
     async logout(): Promise<void> {
-        return fetch("https://localhost:8443/auth/logout", {
+        let response = await fetch("https://localhost:8443/auth/logout", {
             method: "POST",
             credentials: "include",
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return;
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on logout: " + error);
+        });
 
-                    throw new Error("Error on logout: " + error);
-                }
-            });
+        if (response.ok) {
+            return;
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on logout: " + error);
+
+            throw new Error("Error on logout: " + error);
+        }
     }
 
     async register(email: string, username: string, password: string): Promise<void> {
         console.log("REGISTERING: " + JSON.stringify({ email, username, password }));
 
-        return fetch("https://localhost:8443/auth/register", {
+        let response = await fetch("https://localhost:8443/auth/register", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
             body: JSON.stringify({ email, username, password })
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return;
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on registration: " + error);
+        });
 
-                    throw new Error("Error on registration: " + error);
-                }
-            });
+        if (response.ok) {
+            return;
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on registration: " + error);
+
+            throw new Error("Error on registration: " + error);
+        }
     }
 
     render(): JSX.Element {

@@ -34,20 +34,19 @@ export default class Room extends Component<RoomProperties, RoomState> {
     }
 
     async getMediaForRoom(): Promise<RoomMediaResponse> {
-        return fetch("https://localhost:8443/room/media/get/" + this.props.room.url, {
+        let response = await fetch("https://localhost:8443/room/media/get/" + this.props.room.url, {
             method: "GET",
             credentials: "include",
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return await response.json() as RoomMediaResponse;
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on getting media for room: " + error);
+        });
 
-                    throw new Error("Error on getting media for room: " + error);
-                }
-            });
+        if (response.ok) {
+            return await response.json() as RoomMediaResponse;
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on getting media for room: " + error);
+
+            throw new Error("Error on getting media for room: " + error);
+        }
     }
 
     handleNewMediaChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -56,33 +55,28 @@ export default class Room extends Component<RoomProperties, RoomState> {
         });
     }
 
-    addNewMedia(): void {
+    async addNewMedia(): Promise<void> {
         const url = this.state.newMediaInput;
 
         if (!url || url.length === 0) {
             return;
         }
 
-        console.log("we sending:");
-        console.log(JSON.stringify({ url }));
-
-        fetch("https://localhost:8443/room/media/add/" + this.props.room.url, {
+        let response = await fetch("https://localhost:8443/room/media/add/" + this.props.room.url, {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
             body: JSON.stringify({ url })
-        })
-            .then(async response => {
-                console.log("doing a response");
-                if (response.ok) {
-                    await this.getMediaForRoom();
-                } else {
-                    console.log("oh no broke");
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on adding media to room: " + error);
-                    toast("Unable to add media to room.", { type: "error" });
-                }
-            });
+        });
+
+        // not implemented on backend yet
+        if (response.ok) {
+            await this.getMediaForRoom();
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on adding media to room: " + error);
+            toast("Unable to add media to room.", { type: "error" });
+        }
     }
 
     render(): JSX.Element {
@@ -112,20 +106,19 @@ export default class Room extends Component<RoomProperties, RoomState> {
     }
 
     static async getRoom(url: string): Promise<RoomResponse> {
-        return fetch("https://localhost:8443/rooms/get/" + url, {
+        let response = await fetch("https://localhost:8443/rooms/get/" + url, {
             method: "GET",
             credentials: "include",
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return await response.json() as RoomResponse;
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on getting room: " + error);
+        });
 
-                    throw new Error("Error on getting room: " + error);
-                }
-            });
+        if (response.ok) {
+            return await response.json() as RoomResponse;
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on getting room: " + error);
+
+            throw new Error("Error on getting room: " + error);
+        }
     }
 
     static isPotentialRoomUrl(url: string): boolean {

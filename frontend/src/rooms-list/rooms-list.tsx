@@ -32,22 +32,21 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async create(room: RoomCreate): Promise<void> {
-        return fetch("https://localhost:8443/rooms/create", {
+        let response = await fetch("https://localhost:8443/rooms/create", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
             body: JSON.stringify(room)
-        })
-            .then(async response => {
-                if (response.ok) {
-                    return;
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on creating room: " + error);
+        });
 
-                    throw new Error("Error on creating room: " + error);
-                }
-            });
+        if (response.ok) {
+            return;
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on creating room: " + error);
+
+            throw new Error("Error on creating room: " + error);
+        }
     }
 
     async handleCreateRoom(): Promise<void> {
@@ -92,22 +91,23 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async updateRoomList(): Promise<void> {
-        return fetch("https://localhost:8443/rooms/get", {
+        let response = await fetch("https://localhost:8443/rooms/get", {
             method: "GET",
             credentials: "include",
-        })
-            .then(async response => {
-                if (response.ok) {
-                    this.setState({
-                        rooms: (await response.json() as RoomAllResponse).rooms
-                    });
-                } else {
-                    let error = await response.json() as ErrorResponse;
-                    console.log("Error on retrieving rooms: " + error);
+        });
 
-                    throw new Error("Error on retrieving rooms: " + error);
-                }
+        if (response.ok) {
+            let allRooms = await response.json() as RoomAllResponse;
+
+            this.setState({
+                rooms: allRooms.rooms
             });
+        } else {
+            let error = await response.json() as ErrorResponse;
+            console.log("Error on retrieving rooms: " + error);
+
+            throw new Error("Error on retrieving rooms: " + error);
+        }
     }
 
     render(): JSX.Element {
