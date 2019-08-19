@@ -1,21 +1,22 @@
 #[macro_use]
 extern crate diesel;
 
+use crate::controllers::*;
 use crate::middleware::Auth;
 use actix_cors::Cors;
 use actix_redis::RedisSession;
 use actix_web::{http::header, middleware::Logger, web, App, HttpResponse, HttpServer};
 use diesel::{r2d2::ConnectionManager, SqliteConnection};
 use r2d2::Pool;
-use std::{env, io};
+use rustls::{internal::pemfile, NoClientAuth, ServerConfig};
+use std::{env, error::Error, fs::File, io::BufReader};
 
-mod auth;
+mod controllers;
 mod db;
 mod messages;
 mod middleware;
 mod models;
-mod rooms;
-mod util;
+mod services;
 mod ws;
 
 fn secret() -> HttpResponse {
@@ -24,20 +25,28 @@ fn secret() -> HttpResponse {
     HttpResponse::Ok().json("SECRET MESSAGE")
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     dotenv::dotenv().ok();
 
     std::env::set_var(
         "RUST_LOG",
-        "error,warn,info,actix_redis=info,actix_server=info,actix_web=info",
+        "error,warn,info,actix_redis=info,actix_server=trace,actix_web=trace,rustls=info,awc=trace",
     );
 
     env_logger::init();
     let db_url = env::var("DB_URL").expect("Missing DB_URL in env");
     let manager = ConnectionManager::<SqliteConnection>::new(db_url);
+
     let pool = Pool::builder()
         .build(manager)
         .expect("Failed to create connection pool");
+
+    let mut rustls_config = ServerConfig::new(NoClientAuth::new());
+    let cert_file = &mut BufReader::new(File::open("cert.pem")?);
+    let key_file = &mut BufReader::new(File::open("key.pem")?);
+    let cert_chain = pemfile::certs(cert_file).map_err(|_| "Error extracting certificates")?;
+    let mut keys = pemfile::pkcs8_private_keys(key_file).map_err(|_| "Error extracting keys")?;
+    rustls_config.set_single_cert(cert_chain, keys.remove(0))?;
 
     HttpServer::new(move || {
         App::new()
@@ -68,6 +77,19 @@ fn main() -> io::Result<()> {
                     ),
             )
             .service(
+                web::scope("/room")
+                    .service(
+                        web::scope("/media")
+                            .route("/get/{room_id}", web::get().to(media::get_media_for_room))
+                            .route("/add/{room_id}", web::post().to(media::add_media_to_room))
+                            .route(
+                                "/remove/{room_id}",
+                                web::delete().to(media::remove_media_from_room),
+                            ),
+                    )
+                    .wrap(Auth),
+            )
+            .service(
                 web::scope("/rooms")
                     .route("/create", web::post().to(rooms::create))
                     .route("/get", web::get().to(rooms::get_all))
@@ -85,6 +107,8 @@ fn main() -> io::Result<()> {
                     .wrap(Auth),
             )
     })
-    .bind("localhost:8081")?
-    .run()
+    .bind_rustls("localhost:8443", rustls_config)?
+    .run()?;
+
+    Ok(())
 }

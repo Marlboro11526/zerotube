@@ -45,7 +45,7 @@ where
     type Response = ServiceResponse<B>;
     type Error = Error;
     type Future = Either<
-        Box<Future<Item = Self::Response, Error = Self::Error>>,
+        Box<dyn Future<Item = Self::Response, Error = Self::Error>>,
         FutureResult<Self::Response, Self::Error>,
     >;
 

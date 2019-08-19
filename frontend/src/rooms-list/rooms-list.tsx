@@ -32,7 +32,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async create(room: RoomCreate): Promise<void> {
-        return fetch("http://localhost:8081/rooms/create", {
+        return fetch("https://localhost:8443/rooms/create", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -72,8 +72,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        console.log(this.state.newRoom);
-        const target = event.target!;
+        const target = event.target;
         const name = target.name;
         const value = target.type === "checkbox" ? target.checked : target.value;
 
@@ -93,7 +92,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async updateRoomList(): Promise<void> {
-        return fetch("http://localhost:8081/rooms/get", {
+        return fetch("https://localhost:8443/rooms/get", {
             method: "GET",
             credentials: "include",
         })

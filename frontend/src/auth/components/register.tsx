@@ -31,7 +31,7 @@ export default class RegisterForm extends Component<RegisterFormProperties, Regi
     }
 
     handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        const target = event.target!;
+        const target = event.target;
         const name = target.name;
         const value = target.type === "checkbox" ? target.checked : target.value;
 

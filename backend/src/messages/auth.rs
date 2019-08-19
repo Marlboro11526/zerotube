@@ -1,5 +1,5 @@
 use crate::messages::error::ErrorResponse;
-use crate::util;
+use crate::services::passwords;
 use serde::de::{self, Deserialize, Deserializer, Error as DeError, MapAccess, SeqAccess, Visitor};
 use serde::{Deserialize as DeserializeDerive, Serialize};
 use std::fmt::{Formatter, Result as FmtResult};
@@ -23,7 +23,7 @@ pub struct RegisterRequest {
 
 impl RegisterRequest {
     fn new(email: String, raw_password: String, username: String) -> Result<Self, ErrorResponse> {
-        let hashed_password = util::hash_password(raw_password.as_str())?;
+        let hashed_password = passwords::hash_password(raw_password.as_str())?;
 
         Ok(RegisterRequest {
             email,

@@ -25,7 +25,7 @@ export default class ConfirmRegister extends Component<ConfirmRegisterProperties
             return;
         }
 
-        fetch("http://localhost:8081/auth/register/" + this.state.id, {
+        fetch("https://localhost:8443/auth/register/" + this.state.id, {
             method: "GET",
             credentials: "include",
         })

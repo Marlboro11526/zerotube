@@ -27,7 +27,7 @@ export default class LoginForm extends Component<LoginFormProperties, LoginFormS
     }
 
     handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        const TARGET = event.target!;
+        const TARGET = event.target;
         const NAME = TARGET.name;
         const VALUE = TARGET.type === "checkbox" ? TARGET.checked : TARGET.value;
 

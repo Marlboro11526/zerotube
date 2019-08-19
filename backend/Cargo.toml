@@ -11,7 +11,7 @@ actix-redis = "0.6.1"
 actix-rt = "0.2.4"
 actix-service = "0.4.1"
 actix-session = "0.2.0"
-actix-web = "1.0.5"
+actix-web = { version = "1.0.5", features = ["rust-tls"] }
 actix-web-actors = "1.0.2"
 argon2rs = "0.2.5"
 chrono = { version = "0.4.7", features = ["serde"] }
@@ -20,8 +20,11 @@ diesel = { version = "1.4.2", features = ["chrono", "r2d2", "sqlite", "uuid"] }
 dotenv = "0.14.1"
 env_logger= "0.6.2"
 futures = "0.1.28"
-log = "0.4.7"
+iso8601 = { git = "https://github.com/badboy/iso8601", branch = "master" }
+log = "0.4.8"
 r2d2 = "0.8.5"
 rand = "0.7.0"
-serde = { version = "1.0.97", features = ["derive"] }
+regex = "1.2.1"
+rustls = { version = "0.15.2", features = ["dangerous_configuration"] } #0.16.0 conflicts on actix-http, ring
+serde = { version = "1.0.99", features = ["derive"] }
 uuid = { version = "0.7.4", features = ["serde", "v4"] }

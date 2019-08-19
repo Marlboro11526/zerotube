@@ -166,7 +166,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     }
 
     async login(username: string, password: string): Promise<UserResponse> {
-        return fetch("http://localhost:8081/auth/login", {
+        return fetch("https://localhost:8443/auth/login", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -185,7 +185,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     }
 
     async logout(): Promise<void> {
-        return fetch("http://localhost:8081/auth/logout", {
+        return fetch("https://localhost:8443/auth/logout", {
             method: "POST",
             credentials: "include",
         })
@@ -204,7 +204,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     async register(email: string, username: string, password: string): Promise<void> {
         console.log("REGISTERING: " + JSON.stringify({ email, username, password }));
 
-        return fetch("http://localhost:8081/auth/register", {
+        return fetch("https://localhost:8443/auth/register", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),

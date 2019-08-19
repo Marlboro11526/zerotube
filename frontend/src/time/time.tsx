@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-const URL = "ws://localhost:8081/ws/time";
+const URL = "wss://localhost:8443/ws/time";
 
 let isClosing = false;
 let ws: WebSocket;

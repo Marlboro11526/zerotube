@@ -28,7 +28,7 @@ interface AppState {
 
 class App extends Component<AppProperties, AppState> {
     componentDidMount(): void {
-        fetch("http://localhost:8081/auth/start", {
+        fetch("https://localhost:8443/auth/start", {
             method: "GET",
             credentials: "include",
         })
@@ -63,7 +63,7 @@ class App extends Component<AppProperties, AppState> {
     }
 
     showSecret(): void {
-        fetch("http://localhost:8081/web/secret", {
+        fetch("https://localhost:8443/web/secret", {
             method: "GET",
             credentials: "include",
         })
@@ -114,10 +114,6 @@ class App extends Component<AppProperties, AppState> {
             return <span id="loader" />
         }
 
-        if (this.state.isLoggedIn) {
-            time = <Time />
-        }
-
         if (window.location.pathname.startsWith("/rooms")) {
             if (this.state.isLoggedIn) {
                 pageContent = <RoomsList />
@@ -125,6 +121,10 @@ class App extends Component<AppProperties, AppState> {
                 return <Error401 />
             }
         } else if (window.location.pathname === "/") {
+            if (this.state.isLoggedIn) {
+                time = <Time />
+            }
+
             pageContent =
                 <>
                     <Button isPrimary onClick={() => this.showSecret()}>Secret</Button>
@@ -132,13 +132,10 @@ class App extends Component<AppProperties, AppState> {
                     {time}
                 </>
         } else {
-            console.log("1");
-            console.log(this.state.room);
             if (this.state.room) {
-                console.log("2" + this.state.room.name);
                 pageContent =
                     <>
-                        <p>{this.state.room.name} - {this.state.room.description}</p>
+                        <Room room={this.state.room} />
                     </>
             }
             else {
