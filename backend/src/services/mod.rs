@@ -1,3 +1,3 @@
 pub mod duration;
-pub mod media;
+pub mod media_apis;
 pub mod passwords;

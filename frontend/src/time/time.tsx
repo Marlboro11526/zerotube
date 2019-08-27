@@ -23,7 +23,7 @@ export default class Time extends Component<TimeProperties, TimeState> {
     }
 
     componentDidMount(): void {
-        ws = new WebSocket(URL);
+        ws = new WebSocket(URL, "time");
 
         ws.onmessage = event => {
             this.setState({

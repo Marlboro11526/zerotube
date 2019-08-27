@@ -11,7 +11,7 @@ pub fn duration_to_seconds(s: &str) -> Result<u32, ErrorResponse> {
         hour,
         minute,
         second,
-        millisecond,
+        ..
     } = duration
     {
         if day > 0 || month > 0 || year > 0 {

@@ -1,5 +1,7 @@
 use crate::messages::error::ErrorResponse;
 use crate::models::media::Media;
+use awc::Client;
+use futures::future::Future;
 use std::env;
 
 pub fn get_media_youtube(id: &str) -> Result<Media, ErrorResponse> {
@@ -10,6 +12,20 @@ pub fn get_media_youtube(id: &str) -> Result<Media, ErrorResponse> {
     );
 
     log::info!("{}", url);
+
+    Client::new()
+        .get(url)
+        .send()
+        .map_err(|error| {
+            println!("Error: {:?}", error);
+        })
+        .and_then(|response| {
+            println!("Response: {:?}", response);
+            Ok(())
+        })
+        .wait();
+
+    log::info!("DONE");
 
     unimplemented!()
 }

@@ -9,10 +9,11 @@ actix = "0.8.3"
 actix-cors = "0.1.0"
 actix-redis = "0.6.1"
 actix-rt = "0.2.4"
-actix-service = "0.4.1"
+actix-service = "0.4.2"
 actix-session = "0.2.0"
 actix-web = { version = "1.0.5", features = ["rust-tls"] }
 actix-web-actors = "1.0.2"
+awc = { version = "0.2.4", features = ["rust-tls"] }
 argon2rs = "0.2.5"
 chrono = { version = "0.4.7", features = ["serde"] }
 derive_more = "0.15.0"

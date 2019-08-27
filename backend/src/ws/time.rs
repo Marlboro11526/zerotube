@@ -8,10 +8,7 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
 pub fn route(request: HttpRequest, stream: Payload) -> Result<HttpResponse, Error> {
-    println!("Request: {:?}", request);
-
-    // broken in Chrome until actix-web PR #835 lands due to front-end specifying protocol
-    ws::start(TimeWebSocket::new(), &request, stream)
+    ws::start_with_protocols(TimeWebSocket::new(), &["time"], &request, stream)
 }
 
 struct TimeWebSocket {
@@ -40,7 +37,7 @@ impl StreamHandler<Message, ProtocolError> for TimeWebSocket {
                 context.pong(&message);
             }
             Message::Pong(_) => self.heartbeat = Instant::now(),
-            Message::Text(text) => context.text(text),
+            Message::Text(text) => self.response(context, text),
         }
     }
 }
@@ -67,12 +64,12 @@ impl TimeWebSocket {
     }
 
     fn test(&self, context: &mut <Self as Actor>::Context) {
-        context.run_interval(Duration::from_secs(1), |actor, context| {
+        context.run_interval(Duration::from_secs(1), |_, context| {
             context.text(Local::now().to_rfc2822().as_str());
         });
     }
 
     fn response(&self, context: &mut <Self as Actor>::Context, request: String) {
-        context.text(format!("YOU SAY {}, I SAY BAR", request));
+        context.text(format!("You say {}, I say bar", request));
     }
 }

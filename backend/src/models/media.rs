@@ -1,6 +1,6 @@
 use crate::db::entities::room_media::RoomMedia as DbMedia;
 use crate::messages::{error::ErrorResponse, external::youtube::YoutubeVideoItem};
-use crate::services::{duration, media};
+use crate::services::{duration, media_apis};
 use derive_more::Display;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,7 @@ impl Media {
         let youtube = Regex::new(r#"(youtube\.com/watch\?v=|youtu\.be/)(?P<id>[A-Za-z_-]{11})"#)?;
 
         if youtube.is_match(url) {
-            media::get_media_youtube(&youtube.captures(url).unwrap()["id"])
+            media_apis::get_media_youtube(&youtube.captures(url).unwrap()["id"])
         } else {
             Err(ErrorResponse::BadRequest("Unknown media URL".into()))
         }
