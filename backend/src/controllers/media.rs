@@ -1,5 +1,7 @@
 use crate::db::media;
-use crate::messages::media::{AddMediaRequest, GetAllMediaResponse, RemoveMediaRequest};
+use crate::messages::media::{
+    AddMediaLocation, AddMediaRequest, GetAllMediaResponse, RemoveMediaRequest,
+};
 use crate::models::media::Media;
 use actix_web::{
     web::{Data, Json, Path},
@@ -21,13 +23,19 @@ pub fn add_media_to_room(
     request: Json<AddMediaRequest>,
     pool: Data<Pool>,
 ) -> Result<HttpResponse, Error> {
-    log::info!("In method...");
     let connection = pool.get().unwrap();
-    log::info!("Got connection");
-    let media = Media::new(&request.url)?;
-    log::info!("Got media");
+
+    let index = match request.location {
+        AddMediaLocation::Next => request.current + 1,
+        AddMediaLocation::Last => {
+            let latest = media::get_latest_media_index_for_room_with_url(&room_url, &connection)?;
+
+            latest + 1
+        }
+    };
+
+    let media = Media::new(&request.url, index)?;
     media::add_media_to_room_with_url(&room_url, media, &connection)?;
-    log::info!("Added media");
 
     Ok(HttpResponse::Ok().finish())
 }

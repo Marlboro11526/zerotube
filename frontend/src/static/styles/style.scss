@@ -28,3 +28,7 @@
 label > svg {
   margin-left: 5px;
 }
+
+.buttons.flex-children > .button {
+  flex: 1;
+}

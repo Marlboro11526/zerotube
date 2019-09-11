@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     std::env::set_var(
         "RUST_LOG",
-        "error,warn,info,actix_redis=info,actix_server=trace,actix_web=trace,rustls=info,awc=trace",
+        "error,warn,info,actix_redis=info,actix_server=trace,actix_web=trace,rustls=info,actix_connect=trace,actix_https=trace,trust_dns_resolver=debug",
     );
 
     env_logger::init();

@@ -8,7 +8,15 @@ pub struct GetAllMediaResponse {
 
 #[derive(Deserialize)]
 pub struct AddMediaRequest {
+    pub current: u32,
+    pub location: AddMediaLocation,
     pub url: String,
+}
+
+#[derive(Deserialize)]
+pub enum AddMediaLocation {
+    Next,
+    Last,
 }
 
 #[derive(Deserialize)]

@@ -14,11 +14,10 @@ pub fn get_user_with_username(
 ) -> Result<Option<User>, ErrorResponse> {
     use crate::db::schema::users::dsl::*;
 
-    let mut result = users
+    users
         .filter(username.eq(username_input))
-        .load::<DbUser>(connection)?;
-
-    Ok(result.pop().map(|entity| User::from(entity)))
+        .load::<DbUser>(connection)
+        .map(|mut result| Ok(result.pop().map(|entity| User::from(entity))))?
 }
 
 pub fn get_user_with_email(
@@ -27,11 +26,10 @@ pub fn get_user_with_email(
 ) -> Result<Option<User>, ErrorResponse> {
     use crate::db::schema::users::dsl::*;
 
-    let mut result = users
+    users
         .filter(email.eq(email_input))
-        .load::<DbUser>(connection)?;
-
-    Ok(result.pop().map(|entity| User::from(entity)))
+        .load::<DbUser>(connection)
+        .map(|mut result| Ok(result.pop().map(|entity| User::from(entity))))?
 }
 
 pub fn create_user_and_confirmation_email(
@@ -74,11 +72,10 @@ fn get_confirmation_email_by_id(
 ) -> Result<Option<DbConfirmationEmail>, ErrorResponse> {
     use crate::db::schema::confirmation_emails::dsl::*;
 
-    let mut result = confirmation_emails
+    confirmation_emails
         .filter(id.eq(&confirmation_id))
-        .load::<DbConfirmationEmail>(connection)?;
-
-    Ok(result.pop())
+        .load::<DbConfirmationEmail>(connection)
+        .map(|mut result| Ok(result.pop()))?
 }
 
 fn update_user_activity_by_id(

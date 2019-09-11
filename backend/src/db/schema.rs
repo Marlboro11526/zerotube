@@ -12,6 +12,7 @@ table! {
         room_id -> Text,
         source -> Text,
         name -> Text,
+        room_media_index -> Integer,
         seconds -> Integer,
         url -> Text,
     }

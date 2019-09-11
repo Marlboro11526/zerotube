@@ -1,23 +1,24 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct YoutubeVideoListResponse {
     pub items: Vec<YoutubeVideoItem>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct YoutubeVideoItem {
     pub id: String,
     pub snippet: YoutubeVideoItemSnippet,
     pub content_details: YoutubeVideoItemContentDetails,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct YoutubeVideoItemSnippet {
     pub title: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct YoutubeVideoItemContentDetails {
     pub duration: String,
 }

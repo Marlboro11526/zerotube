@@ -12,11 +12,10 @@ pub fn get_room_with_url(
 ) -> Result<Option<Room>, ErrorResponse> {
     use crate::db::schema::rooms::dsl::*;
 
-    let mut result = rooms
+    rooms
         .filter(url.eq(&url_input))
-        .load::<DbRoom>(connection)?;
-
-    Ok(result.pop().map(|entity| Room::from(entity)))
+        .load::<DbRoom>(connection)
+        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
 }
 
 pub fn get_room_with_name_or_url(
@@ -26,12 +25,11 @@ pub fn get_room_with_name_or_url(
 ) -> Result<Option<Room>, ErrorResponse> {
     use crate::db::schema::rooms::dsl::*;
 
-    let mut result = rooms
+    rooms
         .filter(name.eq(name_input))
         .or_filter(url.eq(url_input))
-        .load::<DbRoom>(connection)?;
-
-    Ok(result.pop().map(|entity| Room::from(entity)))
+        .load::<DbRoom>(connection)
+        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
 }
 
 pub fn create_room(room: Room, connection: &Connection) -> Result<(), ErrorResponse> {
@@ -60,9 +58,8 @@ pub(crate) fn get_room_with_url_internal(
 ) -> Result<Option<DbRoom>, ErrorResponse> {
     use crate::db::schema::rooms::dsl::*;
 
-    let mut result = rooms
+    rooms
         .filter(url.eq(&url_input))
-        .load::<DbRoom>(connection)?;
-
-    Ok(result.pop())
+        .load::<DbRoom>(connection)
+        .map(|mut result| Ok(result.pop()))?
 }

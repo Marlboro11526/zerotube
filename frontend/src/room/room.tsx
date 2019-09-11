@@ -1,7 +1,7 @@
 import React, { Component, ChangeEvent } from "react";
 import { RoomResponse } from "../messages/room";
 import ErrorResponse from "../messages/error";
-import { Media, RoomMediaResponse } from "../messages/media";
+import { Media, RoomMediaResponse, AddMediaLocation } from "../messages/media";
 import { Input, Button } from "trunx";
 import { toast } from "react-toastify";
 
@@ -11,6 +11,7 @@ interface RoomProperties {
 
 interface RoomState {
     newMediaInput: string,
+    nowPlaying: Media,
     playlist: Array<Media>,
 }
 
@@ -23,14 +24,19 @@ export default class Room extends Component<RoomProperties, RoomState> {
 
     async componentDidMount(): Promise<void> {
         try {
-            const response = await this.getMediaForRoom();
-
-            this.setState({
-                playlist: response.media
-            });
+            await this.updateMediaState();
         } catch (e) {
             toast("Error on getting media for room.", { type: "error" });
         }
+    }
+
+    async updateMediaState(): Promise<void> {
+        const response = await this.getMediaForRoom();
+
+        this.setState({
+            nowPlaying: response.media[0], // temp hack, not managing playing on the server/client yet
+            playlist: response.media,
+        });
     }
 
     async getMediaForRoom(): Promise<RoomMediaResponse> {
@@ -55,7 +61,8 @@ export default class Room extends Component<RoomProperties, RoomState> {
         });
     }
 
-    async addNewMedia(): Promise<void> {
+    async addNewMedia(location: AddMediaLocation): Promise<void> {
+        const current = this.state.nowPlaying.index;
         const url = this.state.newMediaInput;
 
         if (!url || url.length === 0) {
@@ -66,12 +73,11 @@ export default class Room extends Component<RoomProperties, RoomState> {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
-            body: JSON.stringify({ url })
+            body: JSON.stringify({ current, location, url })
         });
 
-        // not implemented on backend yet
         if (response.ok) {
-            await this.getMediaForRoom();
+            await this.updateMediaState();
         } else {
             let error = await response.json() as ErrorResponse;
             console.log("Error on adding media to room: " + error);
@@ -98,7 +104,10 @@ export default class Room extends Component<RoomProperties, RoomState> {
                             onChange={this.handleNewMediaChange} />
                     </div>
                     <div className="column is-2">
-                        <Button isPrimary isFullwidth onClick={() => this.addNewMedia()}>Add</Button>
+                        <div className="buttons has-addons flex-children">
+                            <Button isPrimary onClick={() => this.addNewMedia("Next")}>Next</Button>
+                            <Button isPrimary onClick={() => this.addNewMedia("Last")}>Last</Button>
+                        </div>
                     </div>
                 </div>
             </>
