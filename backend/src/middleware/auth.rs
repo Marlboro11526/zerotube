@@ -47,7 +47,7 @@ where
     type Error = Error;
     type Future = Either<
         Box<dyn Future<Item = Self::Response, Error = Self::Error>>,
-        FutureResult<Self::Response, Self::Error>
+        FutureResult<Self::Response, Self::Error>,
     >;
 
     fn poll_ready(&mut self) -> Poll<(), Self::Error> {
