@@ -22,7 +22,7 @@ jobs:
         override: true
 
     - name: Sqlite
-      if: matrix.build == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       run: apt-get install sqlite3 libsqlite3-dev
     
     - name: Build
@@ -52,7 +52,7 @@ jobs:
         override: true
 
     - name: Sqlite
-      if: matrix.build == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       run: apt-get install sqlite3 libsqlite3-dev
 
     - name: Build
