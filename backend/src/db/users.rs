@@ -17,7 +17,7 @@ pub fn get_user_with_username(
     users
         .filter(username.eq(username_input))
         .load::<DbUser>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| User::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(User::from)))?
 }
 
 pub fn get_user_with_email(
@@ -29,7 +29,7 @@ pub fn get_user_with_email(
     users
         .filter(email.eq(email_input))
         .load::<DbUser>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| User::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(User::from)))?
 }
 
 pub fn create_user_and_confirmation_email(

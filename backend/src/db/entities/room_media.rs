@@ -19,7 +19,8 @@ pub struct RoomMedia {
 
 impl RoomMedia {
     pub fn new(model: MediaModel, room_id: &str) -> Result<Self, ErrorResponse> {
-        let room_media_index = i32::try_from(model.index).map_err(|_| ErrorResponse::InternalServerError)?;
+        let room_media_index =
+            i32::try_from(model.index).map_err(|_| ErrorResponse::InternalServerError)?;
         let seconds =
             i32::try_from(model.seconds).map_err(|_| ErrorResponse::InternalServerError)?;
 
