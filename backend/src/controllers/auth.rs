@@ -46,7 +46,7 @@ pub fn login(
 
 pub fn logout(session: Session) -> HttpResponse {
     session.purge();
-    
+
     log::info!(
         "Logged out, user is now '{:?}'",
         session.get::<String>("username")

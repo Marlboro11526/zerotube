@@ -1,7 +1,4 @@
-use crate::db::{
-    entities::user::User,
-    schema::confirmation_emails,
-};
+use crate::db::{entities::user::User, schema::confirmation_emails};
 use chrono::{Duration, Local, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

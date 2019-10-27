@@ -44,10 +44,9 @@ where
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
     type Error = Error;
-    type Future = Either<
-        Box<dyn Future<Item = Self::Response, Error = Self::Error>>,
-        FutureResult<Self::Response, Self::Error>,
-    >;
+    type AuthSuccessFuture = Box<dyn Future<Item = Self::Response, Error = Self::Error>>;
+    type AuthFailureFuture = FutureResult<Self::Response, Self::Error>;
+    type Future = Either<AuthSuccessFuture, AuthFailureFuture>;
 
     fn poll_ready(&mut self) -> Poll<(), Self::Error> {
         self.service.poll_ready()

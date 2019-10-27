@@ -15,7 +15,7 @@ pub fn get_room_with_url(
     rooms
         .filter(url.eq(&url_input))
         .load::<DbRoom>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(Room::from)))?
 }
 
 pub fn get_room_with_name_or_url(
@@ -29,7 +29,7 @@ pub fn get_room_with_name_or_url(
         .filter(name.eq(name_input))
         .or_filter(url.eq(url_input))
         .load::<DbRoom>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(Room::from)))?
 }
 
 pub fn create_room(room: Room, connection: &Connection) -> Result<(), ErrorResponse> {
