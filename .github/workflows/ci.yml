@@ -19,9 +19,8 @@ jobs:
         toolchain: beta
         override: true
     
-    - run: cd backend
-    - run: cargo build --verbose
-    - run: cargo test --verbose
+    - run: cd backend && cargo build --verbose
+    - run: cd backend && cargo test --verbose
 
   nightly:
     name: nightly
@@ -40,9 +39,8 @@ jobs:
         toolchain: nightly
         override: true
 
-    - run: cd backend
-    - run: cargo build --verbose
-    - run: cargo test --verbose
+    - run: cd backend && cargo build --verbose
+    - run: cd backend && cargo test --verbose
 
   lint:
     name: lint
@@ -57,14 +55,5 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - run: cd backend
-    
-    - uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
-
-    - uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: -- -D warnings
+    - run: cd backend && cargo fmt --all -- --check
+    - run: cd backend && cargo clippy -- -D warnings
