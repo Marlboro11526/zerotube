@@ -7,7 +7,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest] # windows-latest disabled until sqlite install works...
 
     runs-on: ${{ matrix.os }}
 
@@ -24,18 +24,6 @@ jobs:
     - name: Sqlite (ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install sqlite3 libsqlite3-dev
-
-    - name: Sqlite (windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-          choco install 7zip
-          mkdir C:\sqlite
-          cd C:\sqlite
-          curl -fsS --retry 3 --retry-connrefused -o sqlite3.zip https://sqlite.org/2017/sqlite-dll-win64-x64-3160200.zip
-          7z e sqlite3.zip -y
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          lib /machine:x64 /def:sqlite3.def /out:sqlite3.lib
-          set PATH=%PATH%;C:\sqlite
     
     - name: Build
       working-directory: ./backend
@@ -66,18 +54,6 @@ jobs:
     - name: Sqlite (ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install sqlite3 libsqlite3-dev
-
-    - name: Sqlite (windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-          choco install 7zip
-          mkdir C:\sqlite
-          cd C:\sqlite
-          curl -fsS --retry 3 --retry-connrefused -o sqlite3.zip https://sqlite.org/2017/sqlite-dll-win64-x64-3160200.zip
-          7z e sqlite3.zip -y
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          lib /machine:x64 /def:sqlite3.def /out:sqlite3.lib
-          set PATH=%PATH%;C:\sqlite
 
     - name: Build
       working-directory: ./backend
