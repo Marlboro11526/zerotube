@@ -38,7 +38,7 @@ pub fn create_room(room: Room, connection: &Connection) -> Result<(), ErrorRespo
     let room = DbRoom::new(room);
 
     diesel::insert_into(rooms)
-        .values(room.clone())
+        .values(room)
         .execute(connection)
         .map(|_| Ok(()))?
 }
