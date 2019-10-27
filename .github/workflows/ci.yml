@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest] # windows-latest disabled until sqlite install works...
 
     runs-on: ${{ matrix.os }}
 
