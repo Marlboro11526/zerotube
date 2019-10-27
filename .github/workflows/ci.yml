@@ -1,5 +1,5 @@
 name: GitHub Actions CI
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   beta: # this can be changed to stable once async is available
