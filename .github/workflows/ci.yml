@@ -20,6 +20,10 @@ jobs:
       with:
         toolchain: beta
         override: true
+
+    - name: Sqlite
+      if: matrix.build == 'ubuntu-latest'
+      run: apt-get install sqlite3 libsqlite3-dev
     
     - name: Build
       working-directory: ./backend
@@ -46,6 +50,10 @@ jobs:
       with:
         toolchain: nightly
         override: true
+
+    - name: Sqlite
+      if: matrix.build == 'ubuntu-latest'
+      run: apt-get install sqlite3 libsqlite3-dev
 
     - name: Build
       working-directory: ./backend
