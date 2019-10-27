@@ -12,15 +12,21 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v1
 
-    - uses: actions-rs/toolchain@v1
+    - name: Toolchain
+      uses: actions-rs/toolchain@v1
       with:
         toolchain: beta
         override: true
     
-    - run: cd backend && cargo build --verbose
-    - run: cd backend && cargo test --verbose
+    - name: Build
+      working-directory: ./backend
+      run: cargo build --verbose
+    - name: Test
+      working-directory: ./backend
+      run: cargo test --verbose
 
   nightly:
     name: nightly
@@ -32,15 +38,22 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v1
 
-    - uses: actions-rs/toolchain@v1
+    - name: Toolchain
+      uses: actions-rs/toolchain@v1
       with:
         toolchain: nightly
         override: true
 
-    - run: cd backend && cargo build --verbose
-    - run: cd backend && cargo test --verbose
+    - name: Build
+      working-directory: ./backend
+      run: cargo build --verbose
+
+    - name: Test
+      working-directory: ./backend
+      run: cargo test --verbose
 
   lint:
     name: lint
@@ -55,5 +68,10 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - run: cd backend && cargo fmt --all -- --check
-    - run: cd backend && cargo clippy -- -D warnings
+    - name: Format check
+      working-directory: ./backend
+      run: cargo fmt --all -- --check
+
+    - name: Clippy
+      working-directory: ./backend
+      run: cargo clippy -- -D warnings
