@@ -1,0 +1,66 @@
+name: GitHub Actions CI
+on: [push, pull_request]
+
+jobs:
+  beta: # this can be changed to stable once async is available
+    name: beta
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: beta
+          override: true
+
+    - run: cargo build --verbose
+    - run: cargo test --verbose
+
+  nightly:
+    name: nightly
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+    - run: cargo build --verbose
+    - run: cargo test --verbose
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          components: rustfmt, clippy
+
+    - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+    - uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings
