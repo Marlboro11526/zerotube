@@ -35,6 +35,7 @@ pub struct AuthMiddleware<S> {
     service: S,
 }
 
+#[allow(clippy::type_complexity)]
 impl<S, B> Service for AuthMiddleware<S>
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
@@ -44,9 +45,10 @@ where
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
     type Error = Error;
-    type AuthSuccessFuture = Box<dyn Future<Item = Self::Response, Error = Self::Error>>;
-    type AuthFailureFuture = FutureResult<Self::Response, Self::Error>;
-    type Future = Either<AuthSuccessFuture, AuthFailureFuture>;
+    type Future = Either<
+        Box<dyn Future<Item = Self::Response, Error = Self::Error>>,
+        FutureResult<Self::Response, Self::Error>
+    >;
 
     fn poll_ready(&mut self) -> Poll<(), Self::Error> {
         self.service.poll_ready()
