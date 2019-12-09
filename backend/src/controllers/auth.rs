@@ -21,9 +21,15 @@ pub fn start(session: Session) -> HttpResponse {
     HttpResponse::Ok().json(UserResponse { username })
 }
 
-pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) -> Result<HttpResponse, Error> {
+pub fn login(
+    session: Session,
+    request: Json<LoginRequest>,
+    pool: Data<Pool>,
+) -> Result<HttpResponse, Error> {
     let connection = pool.get().unwrap();
-    let user = users::get_user_with_username(&request.username, &connection)?.ok_or(ErrorResponse::NotFound)?;
+
+    let user = users::get_user_with_username(&request.username, &connection)?
+        .ok_or(ErrorResponse::NotFound)?;
 
     if !passwords::compare_password(&request.password, &user.password)? {
         return Err(Error::from(ErrorResponse::NotFound));
@@ -40,7 +46,11 @@ pub fn login(session: Session, request: Json<LoginRequest>, pool: Data<Pool>) ->
 
 pub fn logout(session: Session) -> HttpResponse {
     session.purge();
-    log::info!("Logged out, user is now '{:?}'", session.get::<String>("username"));
+
+    log::info!(
+        "Logged out, user is now '{:?}'",
+        session.get::<String>("username")
+    );
 
     HttpResponse::Ok().finish()
 }
@@ -50,7 +60,9 @@ pub fn register(pool: Data<Pool>, request: Json<RegisterRequest>) -> Result<Http
     let user = users::get_user_with_email(&request.email, &connection)?;
 
     if user.is_some() {
-        return Err(Error::from(ErrorResponse::BadRequest("User already exists".into())));
+        return Err(Error::from(ErrorResponse::BadRequest(
+            "User already exists".into(),
+        )));
     }
 
     let user = User::from(request.into_inner());
@@ -59,7 +71,10 @@ pub fn register(pool: Data<Pool>, request: Json<RegisterRequest>) -> Result<Http
     Ok(HttpResponse::Ok().finish())
 }
 
-pub fn register_confirm(confirmation_id: Path<String>, pool: Data<Pool>) -> Result<HttpResponse, Error> {
+pub fn register_confirm(
+    confirmation_id: Path<String>,
+    pool: Data<Pool>,
+) -> Result<HttpResponse, Error> {
     let connection = pool.get().unwrap();
     users::confirm_registration(confirmation_id.clone(), &connection)?;
 

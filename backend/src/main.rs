@@ -16,6 +16,7 @@ mod db;
 mod messages;
 mod middleware;
 mod models;
+mod room_server;
 mod services;
 mod ws;
 
@@ -103,6 +104,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             )
             .service(
                 web::scope("/ws")
+                    .route(
+                        "/session/{room_url}",
+                        web::get().to(ws::room_session::route),
+                    )
                     .route("/time", web::get().to(ws::time::route))
                     .wrap(Auth),
             )

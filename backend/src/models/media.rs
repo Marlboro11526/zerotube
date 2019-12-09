@@ -40,7 +40,7 @@ impl From<DbMedia> for Media {
         let seconds = u32::try_from(entity.seconds).unwrap_or(0);
 
         Self {
-            index: index,
+            index,
             name: entity.name,
             seconds,
             source: MediaSource::from(entity.source),

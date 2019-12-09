@@ -15,7 +15,7 @@ pub fn get_room_with_url(
     rooms
         .filter(url.eq(&url_input))
         .load::<DbRoom>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(Room::from)))?
 }
 
 pub fn get_room_with_name_or_url(
@@ -29,7 +29,7 @@ pub fn get_room_with_name_or_url(
         .filter(name.eq(name_input))
         .or_filter(url.eq(url_input))
         .load::<DbRoom>(connection)
-        .map(|mut result| Ok(result.pop().map(|entity| Room::from(entity))))?
+        .map(|mut result| Ok(result.pop().map(Room::from)))?
 }
 
 pub fn create_room(room: Room, connection: &Connection) -> Result<(), ErrorResponse> {
@@ -38,7 +38,7 @@ pub fn create_room(room: Room, connection: &Connection) -> Result<(), ErrorRespo
     let room = DbRoom::new(room);
 
     diesel::insert_into(rooms)
-        .values(room.clone())
+        .values(room)
         .execute(connection)
         .map(|_| Ok(()))?
 }
@@ -52,7 +52,7 @@ pub fn get_all_public(connection: &Connection) -> Result<Vec<Room>, ErrorRespons
         .map(|out| Ok(out.into_iter().map(Room::from).collect::<Vec<Room>>()))?
 }
 
-pub(crate) fn get_room_with_url_internal(
+pub fn get_room_with_url_internal(
     url_input: &str,
     connection: &Connection,
 ) -> Result<Option<DbRoom>, ErrorResponse> {
