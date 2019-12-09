@@ -10,21 +10,22 @@ actix-cors = "0.1.0"
 actix-redis = "0.7.0"
 actix-service = "0.4.2"
 actix-session = "0.2.0"
-actix-web = { version = "1.0.8", features = ["rust-tls"] }
-actix-web-actors = "1.0.2"
+actix-web = { version = "1.0.9", features = ["rust-tls"] }
+actix-web-actors = "1.0.4"
 argon2rs = "0.2.5"
-chrono = { version = "0.4.9", features = ["serde"] }
-derive_more = "0.15.0"
+chrono = { version = "0.4.10", features = ["serde"] }
+derive_more = "0.99.2"
 diesel = { version = "1.4.3", features = ["chrono", "r2d2", "sqlite", "uuid"] }
 dotenv = "0.15.0"
 env_logger= "0.7.1"
 futures = "0.1.29"
 iso8601 = { git = "https://github.com/badboy/iso8601", branch = "master" }
 log = "0.4.8"
-r2d2 = "0.8.6"
+r2d2 = "0.8.7"
 rand = "0.7.2"
 regex = "1.3.1"
 reqwest = { git = "https://github.com/seanmonstar/reqwest", branch = "master", features = ["blocking"] }
 rustls = { version = "0.15.2", features = ["dangerous_configuration"] } #0.16.0 conflicts on actix-http, ring
-serde = { version = "1.0.101", features = ["derive"] }
+serde = { version = "1.0.103", features = ["derive"] }
+serde_json = "1.0.44"
 uuid = { version = "0.8.1", features = ["serde", "v4"] }

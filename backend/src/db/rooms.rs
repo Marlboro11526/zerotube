@@ -52,7 +52,7 @@ pub fn get_all_public(connection: &Connection) -> Result<Vec<Room>, ErrorRespons
         .map(|out| Ok(out.into_iter().map(Room::from).collect::<Vec<Room>>()))?
 }
 
-pub(crate) fn get_room_with_url_internal(
+pub fn get_room_with_url_internal(
     url_input: &str,
     connection: &Connection,
 ) -> Result<Option<DbRoom>, ErrorResponse> {
