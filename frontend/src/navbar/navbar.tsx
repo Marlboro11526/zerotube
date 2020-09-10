@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import { Navbar } from "trunx";
+
 import Auth from "../auth/auth";
 import UserResponse from "../messages/user";
-import { Navbar } from "trunx";
 
 interface NavbarProperties {
     authHandler: any,
@@ -12,25 +13,25 @@ interface NavbarProperties {
 export default class NavbarComponent extends Component<NavbarProperties> {
     componentDidMount(): void {
         document.querySelectorAll(".navbar-burger").forEach(element => {
-            element.addEventListener("click", this.handleBurgerToggle.bind(null, element))
+            element.addEventListener("click", this.handleBurgerToggle.bind(null, element));
         });
     }
 
     componentWillUnmount(): void {
         document.querySelectorAll(".navbar-burger").forEach(element => {
-            element.removeEventListener("click", this.handleBurgerToggle.bind(null, element))
+            element.removeEventListener("click", this.handleBurgerToggle.bind(null, element));
         });
     }
 
     handleBurgerToggle(element: Element): void {
         if (element instanceof HTMLElement) {
-            let target = document.querySelectorAll(".navbar-menu");
+            const target = document.querySelectorAll(".navbar-menu");
 
             if (target) {
                 element.classList.toggle("is-active");
                 target.forEach(element => {
                     element.classList.toggle("is-active");
-                })
+                });
             }
         }
     }
@@ -42,7 +43,7 @@ export default class NavbarComponent extends Component<NavbarProperties> {
             rooms =
                 <Navbar.Item href="/rooms">
                     Rooms
-                </Navbar.Item>
+                </Navbar.Item>;
         }
 
         return (
@@ -66,6 +67,6 @@ export default class NavbarComponent extends Component<NavbarProperties> {
                     </Navbar.End>
                 </Navbar.Menu>
             </Navbar>
-        )
+        );
     }
 }

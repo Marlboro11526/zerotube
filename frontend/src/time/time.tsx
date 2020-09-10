@@ -54,6 +54,6 @@ export default class Time extends Component<TimeProperties, TimeState> {
         return <>
             <p>{this.state.time}</p>
             <button onClick={() => this.testResponse()}>Test</button>
-        </>
+        </>;
     }
 }

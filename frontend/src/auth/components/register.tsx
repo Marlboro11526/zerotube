@@ -1,7 +1,7 @@
-import React, { Component, ChangeEvent } from "react";
-import { Label, Input, Field } from "trunx";
-import Icon from "@mdi/react";
 import { mdiHelpCircle } from "@mdi/js";
+import Icon from "@mdi/react";
+import React, { ChangeEvent,Component } from "react";
+import { Field,Input, Label } from "trunx";
 
 interface RegisterFormProperties {
     inputHandler: any,
@@ -38,7 +38,7 @@ export default class RegisterForm extends Component<RegisterFormProperties, Regi
         this.setState({
             [name]: value,
         } as RegisterFormState,
-            () => this.props.inputHandler(this.state.email, this.state.password, this.state.username));
+        () => this.props.inputHandler(this.state.email, this.state.password, this.state.username));
     }
 
     render(): JSX.Element {

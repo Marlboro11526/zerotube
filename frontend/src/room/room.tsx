@@ -1,9 +1,10 @@
-import React, { Component, ChangeEvent } from "react";
-import { RoomResponse } from "../messages/room";
-import ErrorResponse from "../messages/error";
-import { Media, RoomMediaResponse, AddMediaLocation } from "../messages/media";
-import { Input, Button } from "trunx";
+import React, { ChangeEvent,Component } from "react";
 import { toast } from "react-toastify";
+import { Button,Input } from "trunx";
+
+import ErrorResponse from "../messages/error";
+import { AddMediaLocation,Media, RoomMediaResponse } from "../messages/media";
+import { RoomResponse } from "../messages/room";
 
 interface RoomProperties {
     room: RoomResponse,
@@ -40,7 +41,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
     }
 
     async getMediaForRoom(): Promise<RoomMediaResponse> {
-        let response = await fetch("https://localhost:8443/room/media/get/" + this.props.room.url, {
+        const response = await fetch("https://localhost:8443/room/media/get/" + this.props.room.url, {
             method: "GET",
             credentials: "include",
         });
@@ -48,7 +49,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
         if (response.ok) {
             return await response.json() as RoomMediaResponse;
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on getting media for room: " + error);
 
             throw new Error("Error on getting media for room: " + error);
@@ -69,7 +70,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
             return;
         }
 
-        let response = await fetch("https://localhost:8443/room/media/add/" + this.props.room.url, {
+        const response = await fetch("https://localhost:8443/room/media/add/" + this.props.room.url, {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -79,7 +80,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
         if (response.ok) {
             await this.updateMediaState();
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on adding media to room: " + error);
             toast("Unable to add media to room.", { type: "error" });
         }
@@ -115,7 +116,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
     }
 
     static async getRoom(url: string): Promise<RoomResponse> {
-        let response = await fetch("https://localhost:8443/rooms/get/" + url, {
+        const response = await fetch("https://localhost:8443/rooms/get/" + url, {
             method: "GET",
             credentials: "include",
         });
@@ -123,7 +124,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
         if (response.ok) {
             return await response.json() as RoomResponse;
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on getting room: " + error);
 
             throw new Error("Error on getting room: " + error);
@@ -132,7 +133,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
 
     static isPotentialRoomUrl(url: string): boolean {
         const RESERVED_NAMES = ["confirm", "rooms"];
-        let urlParts = url.split("/");
+        const urlParts = url.split("/");
 
         return (urlParts[0].length > 0) && !RESERVED_NAMES.includes(urlParts[0]);
     }

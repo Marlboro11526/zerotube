@@ -76,7 +76,15 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - name: Format check
+    - name: npm install
+      working-directory: ./frontend
+      run: npm install
+
+    - name: ESLint format check
+      working-directory: ./frontend
+      run: npx eslint src
+
+    - name: Cargo format check
       working-directory: ./backend
       run: cargo fmt --all -- --check
 

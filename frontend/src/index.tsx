@@ -1,18 +1,20 @@
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./static/styles/style.scss";
-import UserResponse from "./messages/user";
-import Time from "./time/time";
-import ConfirmRegister from "./confirm-register/confirm-register";
+
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
-import Navbar from "./navbar/navbar";
-import RoomsList from "./rooms-list/rooms-list";
-import { Section, Container, Button } from "trunx";
+import { Button,Container, Section } from "trunx";
+
+import ConfirmRegister from "./confirm-register/confirm-register";
+import Error401 from "./error/error401";
 import Error404 from "./error/error404";
 import { RoomResponse } from "./messages/room";
+import UserResponse from "./messages/user";
+import Navbar from "./navbar/navbar";
 import Room from "./room/room";
-import Error401 from "./error/error401";
+import RoomsList from "./rooms-list/rooms-list";
+import Time from "./time/time";
 
 interface AppProperties { }
 
@@ -47,11 +49,11 @@ class App extends Component<AppProperties, AppState> {
         }
 
         if (response.ok) {
-            let user = await response.json() as UserResponse;
+            const user = await response.json() as UserResponse;
             this.handleAuth(user);
         }
 
-        let url = document.location.pathname.substring(1);
+        const url = document.location.pathname.substring(1);
 
         if (Room.isPotentialRoomUrl(url)) {
             Room.getRoom(url)
@@ -66,13 +68,13 @@ class App extends Component<AppProperties, AppState> {
     }
 
     async showSecret(): Promise<void> {
-        let response = await fetch("https://localhost:8443/web/secret", {
+        const response = await fetch("https://localhost:8443/web/secret", {
             method: "GET",
             credentials: "include",
         });
 
         if (response.ok) {
-            let text = await response.json()
+            const text = await response.json();
 
             this.setState({ text: text });
         } else {
@@ -100,24 +102,24 @@ class App extends Component<AppProperties, AppState> {
 
         // special case for confirming registration, standalone "page"
         if (window.location.pathname.startsWith("/confirm")) {
-            return <ConfirmRegister />
+            return <ConfirmRegister />;
         }
 
         if (this.state === null || this.state.isLoggedIn === undefined) {
-            return <span id="loader" />
+            return <span id="loader" />;
         }
 
         if (window.location.pathname.startsWith("/rooms")) {
             if (this.state.isLoggedIn) {
-                pageContent = <RoomsList />
+                pageContent = <RoomsList />;
             } else {
-                return <Error401 />
+                return <Error401 />;
             }
         } else if (window.location.pathname === "/") {
             let time;
 
             if (this.state.isLoggedIn) {
-                time = <Time />
+                time = <Time />;
             }
 
             pageContent =
@@ -125,13 +127,13 @@ class App extends Component<AppProperties, AppState> {
                     <Button isPrimary onClick={() => this.showSecret()}>Secret</Button>
                     <p>{this.state.text}</p>
                     {time}
-                </>
+                </>;
         } else {
             if (this.state.room) {
-                pageContent = <Room room={this.state.room} />
+                pageContent = <Room room={this.state.room} />;
             }
             else {
-                return <Error404 />
+                return <Error404 />;
             }
         }
 
@@ -151,7 +153,7 @@ class App extends Component<AppProperties, AppState> {
                     </Container>
                 </Section>
             </>
-        )
+        );
     }
 }
 

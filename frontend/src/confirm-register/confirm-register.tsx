@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import Error404 from "../error/error404";
 import validator from "validator";
+
+import Error404 from "../error/error404";
 
 interface ConfirmRegisterProperties { }
 
@@ -13,7 +14,7 @@ export default class ConfirmRegister extends Component<ConfirmRegisterProperties
     constructor(props: ConfirmRegisterProperties) {
         super(props);
 
-        let id: string = window.location.pathname.slice("/confirm/".length);
+        const id: string = window.location.pathname.slice("/confirm/".length);
 
         this.state = {
             id: validator.isUUID(id) ? id : undefined,
@@ -25,10 +26,10 @@ export default class ConfirmRegister extends Component<ConfirmRegisterProperties
             return;
         }
 
-        let response = await fetch("https://localhost:8443/auth/register/" + this.state.id, {
+        const response = await fetch("https://localhost:8443/auth/register/" + this.state.id, {
             method: "GET",
             credentials: "include",
-        })
+        });
 
         this.setState({ isValid: response.ok });
     }
@@ -42,9 +43,9 @@ export default class ConfirmRegister extends Component<ConfirmRegisterProperties
                 </>
             );
         } else if (this.state.isValid === undefined) {
-            return <></>
+            return <></>;
         } else {
-            return <Error404 />
+            return <Error404 />;
         }
     }
 }

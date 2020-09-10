@@ -1,5 +1,5 @@
-import React, { Component, ChangeEvent } from "react";
-import { Input, Label, Field } from "trunx";
+import React, { ChangeEvent,Component } from "react";
+import { Field,Input, Label } from "trunx";
 
 interface LoginFormProperties {
     inputHandler: any,
@@ -34,7 +34,7 @@ export default class LoginForm extends Component<LoginFormProperties, LoginFormS
         this.setState({
             [NAME]: VALUE,
         } as LoginFormState,
-            () => this.props.inputHandler(this.state.password, this.state.username));
+        () => this.props.inputHandler(this.state.password, this.state.username));
     }
 
     render(): JSX.Element {

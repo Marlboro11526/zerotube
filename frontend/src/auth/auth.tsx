@@ -1,13 +1,14 @@
+import { mdiAccount } from "@mdi/js";
+import { Icon } from "@mdi/react";
 import React, { Component } from "react";
-import UserResponse from "../messages/user";
-import ErrorResponse from "../messages/error";
-import LoginForm from "./components/login";
-import RegisterForm from "./components/register";
-import LogoutForm from "./components/logout";
 import { toast } from "react-toastify";
 import { Button, Buttons } from "trunx";
-import { Icon } from "@mdi/react";
-import { mdiAccount } from "@mdi/js";
+
+import ErrorResponse from "../messages/error";
+import UserResponse from "../messages/user";
+import LoginForm from "./components/login";
+import LogoutForm from "./components/logout";
+import RegisterForm from "./components/register";
 
 interface AuthProperties {
     authHandler: any,
@@ -45,6 +46,8 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         };
     }
 
+    // this will be changed on conversion to hooks
+    // eslint-disable-next-line react/no-deprecated
     componentWillMount(): void {
         window.addEventListener("keydown", this.handleKeyDown.bind(this));
     }
@@ -119,7 +122,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         }
 
         try {
-            let response = await this.login(this.state.loginFormInput.username, this.state.loginFormInput.password);
+            const response = await this.login(this.state.loginFormInput.username, this.state.loginFormInput.password);
             this.props.authHandler(response);
 
             this.setState({
@@ -133,7 +136,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
 
     async handleLogout(): Promise<void> {
         try {
-            let response = await this.logout();
+            const response = await this.logout();
             this.props.authHandler(response);
 
             this.setState({
@@ -155,7 +158,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         }
 
         try {
-            await this.register(this.state.registerFormInput.email, this.state.registerFormInput!.username, this.state.registerFormInput.password);
+            await this.register(this.state.registerFormInput.email, this.state.registerFormInput.username, this.state.registerFormInput.password);
 
             this.setState({
                 showRegisterForm: false
@@ -166,7 +169,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     }
 
     async login(username: string, password: string): Promise<UserResponse> {
-        let response = await fetch("https://localhost:8443/auth/login", {
+        const response = await fetch("https://localhost:8443/auth/login", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -176,7 +179,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         if (response.ok) {
             return response.json();
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on login: " + error);
 
             throw new Error("Error on login: " + error);
@@ -184,7 +187,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     }
 
     async logout(): Promise<void> {
-        let response = await fetch("https://localhost:8443/auth/logout", {
+        const response = await fetch("https://localhost:8443/auth/logout", {
             method: "POST",
             credentials: "include",
         });
@@ -192,7 +195,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         if (response.ok) {
             return;
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on logout: " + error);
 
             throw new Error("Error on logout: " + error);
@@ -202,7 +205,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
     async register(email: string, username: string, password: string): Promise<void> {
         console.log("REGISTERING: " + JSON.stringify({ email, username, password }));
 
-        let response = await fetch("https://localhost:8443/auth/register", {
+        const response = await fetch("https://localhost:8443/auth/register", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -212,7 +215,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         if (response.ok) {
             return;
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on registration: " + error);
 
             throw new Error("Error on registration: " + error);
@@ -229,19 +232,19 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
         let username;
 
         if (this.state.showLoginForm) {
-            authForm = <LoginForm inputHandler={(password: string, username: string) => this.handleLoginInput(password, username)} />
+            authForm = <LoginForm inputHandler={(password: string, username: string) => this.handleLoginInput(password, username)} />;
             authFormButtonCancel = () => this.showLoginForm(false);
             authFormButtonSubmit = () => this.handleLogin();
             authFormName = "Login";
 
         } else if (this.state.showRegisterForm) {
-            authForm = <RegisterForm inputHandler={(email: string, password: string, username: string) => this.handleRegisterInput(email, password, username)} />
+            authForm = <RegisterForm inputHandler={(email: string, password: string, username: string) => this.handleRegisterInput(email, password, username)} />;
             authFormButtonCancel = () => this.showRegisterForm(false);
             authFormButtonSubmit = () => this.handleRegister();
             authFormName = "Register";
 
         } else if (this.state.showLogoutConfirmation) {
-            authForm = <LogoutForm />
+            authForm = <LogoutForm />;
             authFormButtonCancel = () => this.showLogoutConfirmation(false);
             authFormButtonSubmit = () => this.handleLogout();
             authFormName = "Logout";
@@ -264,7 +267,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                             <Button data-cancel onClick={authFormButtonCancel}>Cancel</Button>
                         </footer>
                     </div>
-                </div>
+                </div>;
         }
 
         if (this.props.isLoggedIn) {
@@ -275,7 +278,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                             Logout
                         </Button>
                     </Buttons>
-                </div>
+                </div>;
 
             username =
                 <div className="navbar-item">
@@ -287,7 +290,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                         title="User"
                     />
                     <span>{this.props.username}</span>
-                </div >
+                </div >;
 
         } else {
             buttons =
@@ -300,7 +303,7 @@ export default class AuthComponent extends Component<AuthProperties, AuthState> 
                             Register
                         </Button>
                     </Buttons>
-                </div>
+                </div>;
         }
 
         return (

@@ -1,9 +1,10 @@
-import React, { Component, ChangeEvent } from "react";
-import ErrorResponse from "../messages/error";
-import { RoomCreate, RoomResponse, RoomAllResponse } from "../messages/room";
-import { Table, Button, Label, Input, Checkbox, Field } from "trunx";
-import RoomRow from "./room-row";
+import React, { ChangeEvent,Component } from "react";
 import { toast } from "react-toastify";
+import { Button, Checkbox, Field,Input, Label, Table } from "trunx";
+
+import ErrorResponse from "../messages/error";
+import { RoomAllResponse,RoomCreate, RoomResponse } from "../messages/room";
+import RoomRow from "./room-row";
 
 interface RoomsProperties {
 
@@ -32,7 +33,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async create(room: RoomCreate): Promise<void> {
-        let response = await fetch("https://localhost:8443/rooms/create", {
+        const response = await fetch("https://localhost:8443/rooms/create", {
             method: "POST",
             credentials: "include",
             headers: new Headers([["Content-Type", "application/json"]]),
@@ -42,7 +43,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
         if (response.ok) {
             return;
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on creating room: " + error);
 
             throw new Error("Error on creating room: " + error);
@@ -75,7 +76,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
         const name = target.name;
         const value = target.type === "checkbox" ? target.checked : target.value;
 
-        let newRoom = this.state.newRoom || {};
+        const newRoom = this.state.newRoom || {};
         newRoom[name] = value;
 
         this.setState({
@@ -91,19 +92,19 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
     }
 
     async updateRoomList(): Promise<void> {
-        let response = await fetch("https://localhost:8443/rooms/get", {
+        const response = await fetch("https://localhost:8443/rooms/get", {
             method: "GET",
             credentials: "include",
         });
 
         if (response.ok) {
-            let allRooms = await response.json() as RoomAllResponse;
+            const allRooms = await response.json() as RoomAllResponse;
 
             this.setState({
                 rooms: allRooms.rooms
             });
         } else {
-            let error = await response.json() as ErrorResponse;
+            const error = await response.json() as ErrorResponse;
             console.log("Error on retrieving rooms: " + error);
 
             throw new Error("Error on retrieving rooms: " + error);
@@ -115,7 +116,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
         let rooms;
 
         if (this.state === null) {
-            return <span id="loader" />
+            return <span id="loader" />;
         }
 
         if (this.state.rooms) {
@@ -134,7 +135,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
                     </Table>
                 );
             } else {
-                rooms = <p>Nothing here!!</p>
+                rooms = <p>Nothing here!!</p>;
             }
         }
 
@@ -186,7 +187,7 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
                         </footer>
                     </div>
                 </div>
-            )
+            );
         }
 
         return (
@@ -196,6 +197,6 @@ export default class RoomsList extends Component<RoomsProperties, RoomsState> {
                 {rooms}
                 {createFormModal}
             </>
-        )
+        );
     }
 }
