@@ -43,8 +43,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .expect("Failed to create connection pool");
 
     let mut rustls_config = ServerConfig::new(NoClientAuth::new());
-    let cert_file = &mut BufReader::new(File::open("cert.pem")?);
-    let key_file = &mut BufReader::new(File::open("key.pem")?);
+    let cert_file =
+        &mut BufReader::new(File::open("cert.pem").map_err(|_| "Error getting cert.pem")?);
+    let key_file = &mut BufReader::new(File::open("key.pem").map_err(|_| "Error getting key.pem")?);
     let cert_chain = pemfile::certs(cert_file).map_err(|_| "Error extracting certificates")?;
     let mut keys = pemfile::pkcs8_private_keys(key_file).map_err(|_| "Error extracting keys")?;
     rustls_config.set_single_cert(cert_chain, keys.remove(0))?;

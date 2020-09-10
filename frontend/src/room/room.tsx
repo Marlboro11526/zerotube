@@ -62,7 +62,7 @@ export default class Room extends Component<RoomProperties, RoomState> {
     }
 
     async addNewMedia(location: AddMediaLocation): Promise<void> {
-        const current = this.state.nowPlaying.index;
+        const current = this.state.nowPlaying?.index ?? 0;
         const url = this.state.newMediaInput;
 
         if (!url || url.length === 0) {

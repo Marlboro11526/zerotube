@@ -48,4 +48,4 @@ joinable!(confirmation_emails -> users (user_id));
 joinable!(room_media -> rooms (room_id));
 joinable!(room_media -> sources (source));
 
-allow_tables_to_appear_in_same_query!(confirmation_emails, room_media, rooms, sources, users,);
+allow_tables_to_appear_in_same_query!(confirmation_emails, room_media, rooms, sources, users);
